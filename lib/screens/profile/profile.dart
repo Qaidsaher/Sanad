@@ -1,6 +1,6 @@
-import 'package:autoimagepaper/screens/auth/login.dart';
-import 'package:autoimagepaper/screens/notifications/notifications_screen.dart';
-import 'package:autoimagepaper/screens/profile/setting.dart';
+import 'package:sanad/screens/auth/login.dart';
+import 'package:sanad/screens/notifications/notifications_screen.dart';
+import 'package:sanad/screens/profile/setting.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

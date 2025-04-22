@@ -1,6 +1,6 @@
-import 'package:autoimagepaper/screens/admins/admin_home.dart';
-import 'package:autoimagepaper/screens/admins/dashboard.dart';
-import 'package:autoimagepaper/screens/pilgrims/profile/profile.dart';
+import 'package:sanad/screens/admins/admin_home.dart';
+import 'package:sanad/screens/admins/dashboard.dart';
+import 'package:sanad/screens/pilgrims/profile/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

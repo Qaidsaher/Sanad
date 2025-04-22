@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:autoimagepaper/screens/auth/login.dart';
+import 'package:sanad/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

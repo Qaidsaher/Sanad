@@ -1,10 +1,10 @@
 import 'dart:async'; // For Future
 
-import 'package:autoimagepaper/screens/admins/campaigns.dart';
-import 'package:autoimagepaper/screens/admins/pilgrims.dart';
-import 'package:autoimagepaper/screens/admins/settings.dart';
-import 'package:autoimagepaper/screens/admins/smart_bracelet.dart';
-import 'package:autoimagepaper/screens/admins/users.dart';
+import 'package:sanad/screens/admins/campaigns.dart';
+import 'package:sanad/screens/admins/pilgrims.dart';
+import 'package:sanad/screens/admins/settings.dart';
+import 'package:sanad/screens/admins/smart_bracelet.dart';
+import 'package:sanad/screens/admins/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

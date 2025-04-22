@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:autoimagepaper/screens/auth/login.dart';
-import 'package:autoimagepaper/screens/pilgrims/pilgrimNotifications.dart';
-import 'package:autoimagepaper/screens/pilgrims/profile/setting.dart';
+import 'package:sanad/screens/auth/login.dart';
+import 'package:sanad/screens/pilgrims/pilgrimNotifications.dart';
+import 'package:sanad/screens/pilgrims/profile/setting.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

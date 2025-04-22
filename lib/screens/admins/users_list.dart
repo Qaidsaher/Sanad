@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:autoimagepaper/models/models.dart'; // assuming models are in models.dart
-import 'package:autoimagepaper/screens/admins/user_profile_admin.dart';
+import 'package:sanad/models/models.dart'; // assuming models are in models.dart
+import 'package:sanad/screens/admins/user_profile_admin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

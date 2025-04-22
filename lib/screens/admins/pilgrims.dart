@@ -2,12 +2,12 @@ import 'dart:async'; // For Future
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:autoimagepaper/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sanad/models/models.dart';
 // ========================================================================
 
 // ========================================================================
@@ -41,7 +41,10 @@ class PilgrimListScreen extends StatelessWidget {
   const PilgrimListScreen({Key? key}) : super(key: key);
 
   Future<void> _confirmDelete(
-      BuildContext context, String pilgrimId, String name) async {
+    BuildContext context,
+    String pilgrimId,
+    String name,
+  ) async {
     return Get.defaultDialog(
       title: "confirmDelete".tr,
       titleStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -58,11 +61,12 @@ class PilgrimListScreen extends StatelessWidget {
             WriteBatch batch = FirebaseFirestore.instance.batch();
 
             // Get all health_data documents under the pilgrim.
-            QuerySnapshot healthDataSnapshot = await FirebaseFirestore.instance
-                .collection(pilgrimsCollection)
-                .doc(pilgrimId)
-                .collection(healthDataSubcollection)
-                .get();
+            QuerySnapshot healthDataSnapshot =
+                await FirebaseFirestore.instance
+                    .collection(pilgrimsCollection)
+                    .doc(pilgrimId)
+                    .collection(healthDataSubcollection)
+                    .get();
 
             // Queue deletion for each health_data document.
             for (var doc in healthDataSnapshot.docs) {
@@ -94,18 +98,14 @@ class PilgrimListScreen extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.redAccent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text("delete".tr, style: const TextStyle(color: Colors.white)),
       ),
       cancel: OutlinedButton(
         onPressed: () => Get.back(),
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           side: const BorderSide(color: Colors.red),
         ),
         child: Text("cancel".tr, style: const TextStyle(color: Colors.black)),
@@ -117,10 +117,11 @@ class PilgrimListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(pilgrimsCollection)
-            .orderBy('lastName')
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection(pilgrimsCollection)
+                .orderBy('lastName')
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -144,8 +145,9 @@ class PilgrimListScreen extends StatelessWidget {
                 try {
                   // avatarProvider = MemoryImage(base64Decode(pilgrim.avatar!));
                 } catch (e) {
-                  avatarProvider =
-                      const AssetImage('assets/default_avatar.png');
+                  avatarProvider = const AssetImage(
+                    'assets/default_avatar.png',
+                  );
                 }
               } else {
                 avatarProvider = const AssetImage('assets/default_avatar.png');
@@ -154,28 +156,36 @@ class PilgrimListScreen extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: avatarProvider,
-                  ),
+                  leading: CircleAvatar(backgroundImage: avatarProvider),
                   title: Text(pilgrim.fullName),
                   subtitle: Text(
-                      "${'age'.tr}: ${pilgrim.age}, ${'gender'.tr}: ${pilgrim.gender.tr}"),
+                    "${'age'.tr}: ${pilgrim.age}, ${'gender'.tr}: ${pilgrim.gender.tr}",
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined,
-                            color: Colors.orange),
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          color: Colors.orange,
+                        ),
                         tooltip: 'editPilgrim'.tr,
-                        onPressed: () =>
-                            Get.to(() => EditPilgrimPage(pilgrim: pilgrim)),
+                        onPressed:
+                            () =>
+                                Get.to(() => EditPilgrimPage(pilgrim: pilgrim)),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outlined,
-                            color: Colors.red),
+                        icon: const Icon(
+                          Icons.delete_outlined,
+                          color: Colors.red,
+                        ),
                         tooltip: 'delete'.tr,
-                        onPressed: () => _confirmDelete(
-                            context, pilgrim.id, pilgrim.fullName),
+                        onPressed:
+                            () => _confirmDelete(
+                              context,
+                              pilgrim.id,
+                              pilgrim.fullName,
+                            ),
                       ),
                     ],
                   ),
@@ -250,8 +260,9 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
 
   // Method to pick avatar image (using image_picker)
   Future<void> _pickAvatar() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       setState(() {
         _avatarFile = File(pickedFile.path);
@@ -270,45 +281,61 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
     setState(() => _loadingDropdowns = true);
     try {
       // Fetch Campaigns
-      QuerySnapshot campaignSnapshot = await FirebaseFirestore.instance
-          .collection(campaignsCollection)
-          .orderBy('campaignName')
-          .get();
-      _campaignItems = campaignSnapshot.docs
-          .map((doc) => DropdownMenuItem<String>(
-              value: doc.id,
-              child: Text(
-                  "${doc.get('campaignName')} (${doc.get('campaignYear')})")))
-          .toList();
+      QuerySnapshot campaignSnapshot =
+          await FirebaseFirestore.instance
+              .collection(campaignsCollection)
+              .orderBy('campaignName')
+              .get();
+      _campaignItems =
+          campaignSnapshot.docs
+              .map(
+                (doc) => DropdownMenuItem<String>(
+                  value: doc.id,
+                  child: Text(
+                    "${doc.get('campaignName')} (${doc.get('campaignYear')})",
+                  ),
+                ),
+              )
+              .toList();
 
       // Fetch Unassigned Bracelets
-      QuerySnapshot braceletSnapshot = await FirebaseFirestore.instance
-          .collection(smartBraceletsCollection)
-          .get();
+      QuerySnapshot braceletSnapshot =
+          await FirebaseFirestore.instance
+              .collection(smartBraceletsCollection)
+              .get();
       List<String> allBraceletIds =
           braceletSnapshot.docs.map((doc) => doc.id).toList();
       Set<String> assignedBraceletIds = {};
       if (allBraceletIds.isNotEmpty) {
-        QuerySnapshot assignedPilgrimsSnapshot = await FirebaseFirestore
-            .instance
-            .collection(pilgrimsCollection)
-            .where('braceletId', whereIn: allBraceletIds)
-            .get();
-        assignedBraceletIds = assignedPilgrimsSnapshot.docs
-            .map((doc) => doc.get('braceletId') as String)
-            .where((id) => id.isNotEmpty)
-            .toSet();
+        QuerySnapshot assignedPilgrimsSnapshot =
+            await FirebaseFirestore.instance
+                .collection(pilgrimsCollection)
+                .where('braceletId', whereIn: allBraceletIds)
+                .get();
+        assignedBraceletIds =
+            assignedPilgrimsSnapshot.docs
+                .map((doc) => doc.get('braceletId') as String)
+                .where((id) => id.isNotEmpty)
+                .toSet();
       }
-      _braceletItems = braceletSnapshot.docs
-          .where((doc) => !assignedBraceletIds.contains(doc.id))
-          .map((doc) => DropdownMenuItem<String>(
-              value: doc.id, child: Text(doc.get('serialNumber'))))
-          .toList();
+      _braceletItems =
+          braceletSnapshot.docs
+              .where((doc) => !assignedBraceletIds.contains(doc.id))
+              .map(
+                (doc) => DropdownMenuItem<String>(
+                  value: doc.id,
+                  child: Text(doc.get('serialNumber')),
+                ),
+              )
+              .toList();
     } catch (e) {
       print("Error loading dropdowns: $e");
       if (mounted)
-        Get.snackbar('error'.tr, 'errorLoadingDropdownData'.tr,
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'error'.tr,
+          'errorLoadingDropdownData'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
       _campaignItems = [];
       _braceletItems = [];
     } finally {
@@ -321,10 +348,13 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
       if (_selectedGender == null ||
           _selectedCampaignId == null ||
           _selectedBraceletId == null) {
-        Get.snackbar('error'.tr, 'pleaseSelectAllRequired'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.orangeAccent,
-            colorText: Colors.black);
+        Get.snackbar(
+          'error'.tr,
+          'pleaseSelectAllRequired'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orangeAccent,
+          colorText: Colors.black,
+        );
         return;
       }
       if (_isLoading) return;
@@ -333,8 +363,9 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
         // Create Firebase Authentication user using email and password.
         UserCredential authResult = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
-                email: _emailController.text.trim(),
-                password: _passwordController.text.trim());
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            );
         String newUserId = authResult.user!.uid;
 
         // If an avatar image was picked, convert it to base64.
@@ -387,16 +418,21 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
           'pilgrimId': pilgrimRef.id,
         });
 
-        Get.snackbar('success'.tr, 'pilgrimCreatedSuccess'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white);
+        Get.snackbar(
+          'success'.tr,
+          'pilgrimCreatedSuccess'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.back();
       } catch (e) {
         Get.snackbar(
-            'error'.tr, '${'errorCreatingPilgrim'.tr}: ${e.toString()}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent);
+          'error'.tr,
+          '${'errorCreatingPilgrim'.tr}: ${e.toString()}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+        );
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -429,10 +465,11 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: _avatarFile != null
-                          ? FileImage(_avatarFile!)
-                          : const AssetImage('assets/default_avatar.png')
-                              as ImageProvider,
+                      backgroundImage:
+                          _avatarFile != null
+                              ? FileImage(_avatarFile!)
+                              : const AssetImage('assets/default_avatar.png')
+                                  as ImageProvider,
                     ),
                     Positioned(
                       bottom: 0,
@@ -446,130 +483,161 @@ class _CreatePilgrimPageState extends State<CreatePilgrimPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text('personalInformation'.tr,
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'personalInformation'.tr,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 10),
               TextFormField(
-                  controller: _firstNameController,
-                  decoration:
-                      _inputDecoration('firstName'.tr, Icons.person_outline),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _firstNameController,
+                decoration: _inputDecoration(
+                  'firstName'.tr,
+                  Icons.person_outline,
+                ),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _middleNameController,
-                  decoration:
-                      _inputDecoration('middleName'.tr, Icons.person_outline)),
+                controller: _middleNameController,
+                decoration: _inputDecoration(
+                  'middleName'.tr,
+                  Icons.person_outline,
+                ),
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _lastNameController,
-                  decoration:
-                      _inputDecoration('lastName'.tr, Icons.person_outline),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _lastNameController,
+                decoration: _inputDecoration(
+                  'lastName'.tr,
+                  Icons.person_outline,
+                ),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _ageController,
-                  decoration: _inputDecoration('age'.tr, Icons.cake_outlined),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v!.isEmpty) return 'requiredField'.tr;
-                    if (int.tryParse(v) == null || int.parse(v) <= 0)
-                      return 'invalidAge'.tr;
-                    return null;
-                  }),
+                controller: _ageController,
+                decoration: _inputDecoration('age'.tr, Icons.cake_outlined),
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v!.isEmpty) return 'requiredField'.tr;
+                  if (int.tryParse(v) == null || int.parse(v) <= 0)
+                    return 'invalidAge'.tr;
+                  return null;
+                },
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _emailController,
-                  decoration:
-                      _inputDecoration('email'.tr, Icons.email_outlined),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _emailController,
+                decoration: _inputDecoration('email'.tr, Icons.email_outlined),
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _passwordController,
-                  decoration:
-                      _inputDecoration('password'.tr, Icons.lock_outline),
-                  obscureText: true,
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _passwordController,
+                decoration: _inputDecoration('password'.tr, Icons.lock_outline),
+                obscureText: true,
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _phoneController,
-                  decoration: _inputDecoration('phone'.tr, Icons.phone),
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _phoneController,
+                decoration: _inputDecoration('phone'.tr, Icons.phone),
+                keyboardType: TextInputType.phone,
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _countryController,
-                  decoration:
-                      _inputDecoration('country'.tr, Icons.flag_outlined),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _countryController,
+                decoration: _inputDecoration('country'.tr, Icons.flag_outlined),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                  decoration: _inputDecoration('gender'.tr, Icons.wc_outlined),
-                  value: _selectedGender,
-                  items: [
-                    DropdownMenuItem(value: 'Male', child: Text('male'.tr)),
-                    DropdownMenuItem(value: 'Female', child: Text('female'.tr))
-                  ],
-                  onChanged: (v) => setState(() => _selectedGender = v),
-                  validator: (v) => v == null ? 'requiredField'.tr : null),
+                decoration: _inputDecoration('gender'.tr, Icons.wc_outlined),
+                value: _selectedGender,
+                items: [
+                  DropdownMenuItem(value: 'Male', child: Text('male'.tr)),
+                  DropdownMenuItem(value: 'Female', child: Text('female'.tr)),
+                ],
+                onChanged: (v) => setState(() => _selectedGender = v),
+                validator: (v) => v == null ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 24),
-              Text('assignmentInformation'.tr,
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'assignmentInformation'.tr,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 10),
               _loadingDropdowns
                   ? const Center(
-                      child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: CircularProgressIndicator()))
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
                   : Column(
-                      children: [
-                        DropdownButtonFormField<String>(
-                            decoration: _inputDecoration(
-                                'campaign'.tr, Icons.campaign_outlined),
-                            value: _selectedCampaignId,
-                            items: _campaignItems.isEmpty
+                    children: [
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration(
+                          'campaign'.tr,
+                          Icons.campaign_outlined,
+                        ),
+                        value: _selectedCampaignId,
+                        items:
+                            _campaignItems.isEmpty
                                 ? [
-                                    DropdownMenuItem(
-                                        value: null,
-                                        child: Text('noCampaignsAvailable'.tr))
-                                  ]
+                                  DropdownMenuItem(
+                                    value: null,
+                                    child: Text('noCampaignsAvailable'.tr),
+                                  ),
+                                ]
                                 : _campaignItems,
-                            onChanged: _campaignItems.isEmpty
+                        onChanged:
+                            _campaignItems.isEmpty
                                 ? null
                                 : (v) =>
                                     setState(() => _selectedCampaignId = v),
-                            validator: (v) =>
-                                v == null ? 'requiredField'.tr : null,
-                            isExpanded: true),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                            decoration: _inputDecoration(
-                                'smartBracelet'.tr, Icons.watch_outlined),
-                            value: _selectedBraceletId,
-                            items: _braceletItems.isEmpty
+                        validator: (v) => v == null ? 'requiredField'.tr : null,
+                        isExpanded: true,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: _inputDecoration(
+                          'smartBracelet'.tr,
+                          Icons.watch_outlined,
+                        ),
+                        value: _selectedBraceletId,
+                        items:
+                            _braceletItems.isEmpty
                                 ? [
-                                    DropdownMenuItem(
-                                        value: null,
-                                        child: Text('noBraceletsAvailable'.tr))
-                                  ]
+                                  DropdownMenuItem(
+                                    value: null,
+                                    child: Text('noBraceletsAvailable'.tr),
+                                  ),
+                                ]
                                 : _braceletItems,
-                            onChanged: _braceletItems.isEmpty
+                        onChanged:
+                            _braceletItems.isEmpty
                                 ? null
                                 : (v) =>
                                     setState(() => _selectedBraceletId = v),
-                            validator: (v) =>
-                                v == null ? 'requiredField'.tr : null),
-                      ],
-                    ),
+                        validator: (v) => v == null ? 'requiredField'.tr : null,
+                      ),
+                    ],
+                  ),
               const SizedBox(height: 30),
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50)),
-                  onPressed:
-                      _isLoading || _loadingDropdowns ? null : _createPilgrim,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text('create'.tr)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                onPressed:
+                    _isLoading || _loadingDropdowns ? null : _createPilgrim,
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('create'.tr),
+              ),
             ],
           ),
         ),
@@ -610,10 +678,12 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
   @override
   void initState() {
     super.initState();
-    _firstNameController =
-        TextEditingController(text: widget.pilgrim.firstName);
-    _middleNameController =
-        TextEditingController(text: widget.pilgrim.middleName);
+    _firstNameController = TextEditingController(
+      text: widget.pilgrim.firstName,
+    );
+    _middleNameController = TextEditingController(
+      text: widget.pilgrim.middleName,
+    );
     _lastNameController = TextEditingController(text: widget.pilgrim.lastName);
     _ageController = TextEditingController(text: widget.pilgrim.age.toString());
     _selectedGender = widget.pilgrim.gender;
@@ -634,8 +704,9 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
 
   // Method to pick a new avatar image for editing.
   Future<void> _pickAvatar() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       setState(() {
         _newAvatarFile = File(pickedFile.path);
@@ -647,51 +718,69 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
     if (!mounted) return;
     setState(() => _loadingDropdowns = true);
     try {
-      QuerySnapshot campaignSnapshot = await FirebaseFirestore.instance
-          .collection(campaignsCollection)
-          .orderBy('campaignName')
-          .get();
-      _campaignItems = campaignSnapshot.docs
-          .map((doc) => DropdownMenuItem<String>(
-              value: doc.id,
-              child: Text(
-                  "${doc.get('campaignName')} (${doc.get('campaignYear')})")))
-          .toList();
+      QuerySnapshot campaignSnapshot =
+          await FirebaseFirestore.instance
+              .collection(campaignsCollection)
+              .orderBy('campaignName')
+              .get();
+      _campaignItems =
+          campaignSnapshot.docs
+              .map(
+                (doc) => DropdownMenuItem<String>(
+                  value: doc.id,
+                  child: Text(
+                    "${doc.get('campaignName')} (${doc.get('campaignYear')})",
+                  ),
+                ),
+              )
+              .toList();
 
-      QuerySnapshot braceletSnapshot = await FirebaseFirestore.instance
-          .collection(smartBraceletsCollection)
-          .get();
+      QuerySnapshot braceletSnapshot =
+          await FirebaseFirestore.instance
+              .collection(smartBraceletsCollection)
+              .get();
       List<String> allBraceletIds =
           braceletSnapshot.docs.map((doc) => doc.id).toList();
       Set<String> assignedToOthersIds = {};
       if (allBraceletIds.isNotEmpty) {
-        QuerySnapshot assignedPilgrimsSnapshot = await FirebaseFirestore
-            .instance
-            .collection(pilgrimsCollection)
-            .where('braceletId', whereIn: allBraceletIds)
-            .where(FieldPath.documentId, isNotEqualTo: widget.pilgrim.id)
-            .get();
-        assignedToOthersIds = assignedPilgrimsSnapshot.docs
-            .map((doc) => doc.get('braceletId') as String)
-            .where((id) => id.isNotEmpty)
-            .toSet();
+        QuerySnapshot assignedPilgrimsSnapshot =
+            await FirebaseFirestore.instance
+                .collection(pilgrimsCollection)
+                .where('braceletId', whereIn: allBraceletIds)
+                .where(FieldPath.documentId, isNotEqualTo: widget.pilgrim.id)
+                .get();
+        assignedToOthersIds =
+            assignedPilgrimsSnapshot.docs
+                .map((doc) => doc.get('braceletId') as String)
+                .where((id) => id.isNotEmpty)
+                .toSet();
       }
-      _braceletItems = braceletSnapshot.docs.where((doc) {
-        return !assignedToOthersIds.contains(doc.id);
-      }).map((doc) {
-        final bracelet = SmartBracelet.fromFirestore(doc);
-        return DropdownMenuItem<String>(
-            value: bracelet.id,
-            child: Text(bracelet.serialNumber +
-                (doc.id == widget.pilgrim.braceletId
-                    ? ' (${'current'.tr})'
-                    : '')));
-      }).toList();
+      _braceletItems =
+          braceletSnapshot.docs
+              .where((doc) {
+                return !assignedToOthersIds.contains(doc.id);
+              })
+              .map((doc) {
+                final bracelet = SmartBracelet.fromFirestore(doc);
+                return DropdownMenuItem<String>(
+                  value: bracelet.id,
+                  child: Text(
+                    bracelet.serialNumber +
+                        (doc.id == widget.pilgrim.braceletId
+                            ? ' (${'current'.tr})'
+                            : ''),
+                  ),
+                );
+              })
+              .toList();
     } catch (e) {
       print("Error loading dropdowns: $e");
       if (mounted)
-        Get.snackbar('error'.tr, 'errorLoadingDropdownData'.tr,
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'error'.tr,
+          'errorLoadingDropdownData'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
       _campaignItems = [];
       _braceletItems = [];
     } finally {
@@ -704,10 +793,13 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
       if (_selectedGender == null ||
           _selectedCampaignId == null ||
           _selectedBraceletId == null) {
-        Get.snackbar('error'.tr, 'pleaseSelectAllRequired'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.orangeAccent,
-            colorText: Colors.black);
+        Get.snackbar(
+          'error'.tr,
+          'pleaseSelectAllRequired'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orangeAccent,
+          colorText: Colors.black,
+        );
         return;
       }
       if (_isLoading) return;
@@ -743,16 +835,21 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
             .collection(usersCollection)
             .doc(widget.pilgrim.userId)
             .update({'avatar': updatedAvatar});
-        Get.snackbar('success'.tr, 'pilgrimUpdatedSuccess'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white);
+        Get.snackbar(
+          'success'.tr,
+          'pilgrimUpdatedSuccess'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.back();
       } catch (e) {
         Get.snackbar(
-            'error'.tr, '${'errorUpdatingPilgrim'.tr}: ${e.toString()}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent);
+          'error'.tr,
+          '${'errorUpdatingPilgrim'.tr}: ${e.toString()}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+        );
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -784,9 +881,11 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: _newAvatarFile != null
-                          ? FileImage(_newAvatarFile!)
-                          : (_avatarBase64 != null && _avatarBase64!.isNotEmpty)
+                      backgroundImage:
+                          _newAvatarFile != null
+                              ? FileImage(_newAvatarFile!)
+                              : (_avatarBase64 != null &&
+                                  _avatarBase64!.isNotEmpty)
                               ? MemoryImage(base64Decode(_avatarBase64!))
                               : const AssetImage('assets/default_avatar.png')
                                   as ImageProvider,
@@ -803,45 +902,60 @@ class _EditPilgrimPageState extends State<EditPilgrimPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text('personalInformation'.tr,
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'personalInformation'.tr,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 10),
               TextFormField(
-                  controller: _firstNameController,
-                  decoration:
-                      _inputDecoration('firstName'.tr, Icons.person_outline),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _firstNameController,
+                decoration: _inputDecoration(
+                  'firstName'.tr,
+                  Icons.person_outline,
+                ),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _middleNameController,
-                  decoration:
-                      _inputDecoration('middleName'.tr, Icons.person_outline)),
+                controller: _middleNameController,
+                decoration: _inputDecoration(
+                  'middleName'.tr,
+                  Icons.person_outline,
+                ),
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _lastNameController,
-                  decoration:
-                      _inputDecoration('lastName'.tr, Icons.person_outline),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _lastNameController,
+                decoration: _inputDecoration(
+                  'lastName'.tr,
+                  Icons.person_outline,
+                ),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _ageController,
-                  decoration: _inputDecoration('age'.tr, Icons.cake_outlined),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v!.isEmpty) return 'requiredField'.tr;
-                    if (int.tryParse(v) == null || int.parse(v) <= 0)
-                      return 'invalidAge'.tr;
-                    return null;
-                  }),
+                controller: _ageController,
+                decoration: _inputDecoration('age'.tr, Icons.cake_outlined),
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  if (v!.isEmpty) return 'requiredField'.tr;
+                  if (int.tryParse(v) == null || int.parse(v) <= 0)
+                    return 'invalidAge'.tr;
+                  return null;
+                },
+              ),
               const SizedBox(height: 30),
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50)),
-                  onPressed:
-                      _isLoading || _loadingDropdowns ? null : _updatePilgrim,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text('update'.tr)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                onPressed:
+                    _isLoading || _loadingDropdowns ? null : _updatePilgrim,
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('update'.tr),
+              ),
             ],
           ),
         ),

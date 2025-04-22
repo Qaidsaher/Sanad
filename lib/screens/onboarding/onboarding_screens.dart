@@ -1,6 +1,6 @@
-import 'package:autoimagepaper/core/localization/language.dart';
-import 'package:autoimagepaper/core/theme/theme_controller.dart';
-import 'package:autoimagepaper/screens/splash.dart';
+import 'package:sanad/core/localization/language.dart';
+import 'package:sanad/core/theme/theme_controller.dart';
+import 'package:sanad/screens/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

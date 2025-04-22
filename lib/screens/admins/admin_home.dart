@@ -1,13 +1,13 @@
 import 'dart:math';
 
-import 'package:autoimagepaper/screens/admins/campaig.dart';
-import 'package:autoimagepaper/screens/admins/health_notifications.dart';
-import 'package:autoimagepaper/screens/admins/medical_services.dart';
-import 'package:autoimagepaper/screens/admins/settings.dart';
-import 'package:autoimagepaper/screens/admins/users_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/screens/admins/campaig.dart';
+import 'package:sanad/screens/admins/health_notifications.dart';
+import 'package:sanad/screens/admins/medical_services.dart';
+import 'package:sanad/screens/admins/settings.dart';
+import 'package:sanad/screens/admins/users_list.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AdminHomePage extends StatefulWidget {
@@ -30,7 +30,9 @@ class _AdminHomePageState extends State<AdminHomePage>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
     _animationController.forward();
 
     // Generate random stats
@@ -55,22 +57,23 @@ class _AdminHomePageState extends State<AdminHomePage>
   Widget _buildAccountMenu(BuildContext context) {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert, color: Colors.white),
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: "logout",
-          child: ListTile(
-            leading: const Icon(Icons.logout),
-            title: Text("logout".tr),
-          ),
-        ),
-        PopupMenuItem(
-          value: "delete",
-          child: ListTile(
-            leading: const Icon(Icons.delete_forever),
-            title: Text("delete_account".tr),
-          ),
-        ),
-      ],
+      itemBuilder:
+          (context) => [
+            PopupMenuItem(
+              value: "logout",
+              child: ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text("logout".tr),
+              ),
+            ),
+            PopupMenuItem(
+              value: "delete",
+              child: ListTile(
+                leading: const Icon(Icons.delete_forever),
+                title: Text("delete_account".tr),
+              ),
+            ),
+          ],
       onSelected: (value) async {
         if (value == "logout") {
           await FirebaseAuth.instance.signOut();
@@ -78,32 +81,42 @@ class _AdminHomePageState extends State<AdminHomePage>
         } else if (value == "delete") {
           bool confirmed = await showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: Text("delete_account".tr),
-              content: Text("delete_account_confirm".tr),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text("cancel".tr),
+            builder:
+                (context) => AlertDialog(
+                  title: Text("delete_account".tr),
+                  content: Text("delete_account_confirm".tr),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text("cancel".tr),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                      ),
+                      child: Text("delete".tr),
+                    ),
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent),
-                  child: Text("delete".tr),
-                ),
-              ],
-            ),
           );
           if (confirmed) {
             try {
               await FirebaseAuth.instance.currentUser!.delete();
               Get.offAllNamed('/login');
-              Get.snackbar("account_deleted".tr, "account_deleted_msg".tr,
-                  backgroundColor: Colors.green, colorText: Colors.white);
+              Get.snackbar(
+                "account_deleted".tr,
+                "account_deleted_msg".tr,
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+              );
             } catch (e) {
-              Get.snackbar("delete_error".tr, e.toString(),
-                  backgroundColor: Colors.red, colorText: Colors.white);
+              Get.snackbar(
+                "delete_error".tr,
+                e.toString(),
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+              );
             }
           }
         }
@@ -130,7 +143,11 @@ class _AdminHomePageState extends State<AdminHomePage>
   }
 
   Widget _statusStat(
-      BuildContext context, IconData icon, String label, int count) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    int count,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -147,8 +164,13 @@ class _AdminHomePageState extends State<AdminHomePage>
   }
 
   // Grid card for each admin dashboard option.
-  Widget _adminCard(BuildContext context, IconData icon, String label,
-      VoidCallback onTap, Color color) {
+  Widget _adminCard(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+    Color color,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -212,10 +234,7 @@ class _AdminHomePageState extends State<AdminHomePage>
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         elevation: 4,
-        child: Container(
-          height: 80,
-          padding: const EdgeInsets.all(16),
-        ),
+        child: Container(height: 80, padding: const EdgeInsets.all(16)),
       ),
     );
   }
@@ -224,8 +243,10 @@ class _AdminHomePageState extends State<AdminHomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("admin_panel".tr,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          "admin_panel".tr,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -242,34 +263,55 @@ class _AdminHomePageState extends State<AdminHomePage>
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
-                child: _isLoading
-                    ? _buildGridShimmer()
-                    : GridView.count(
-                        key: const ValueKey('gridContent'),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        children: [
-                          _adminCard(context, Icons.people, "pilgrims".tr, () {
-                            Get.to(() => const UsersListPage());
-                          }, Colors.blue),
-                          _adminCard(context, Icons.health_and_safety,
-                              "health_notifications".tr, () {
-                            Get.to(() => const HealthNotificationsPage());
-                          }, Colors.red),
-                          _adminCard(context, Icons.medical_services,
-                              "medical_services".tr, () {
-                            Get.to(() => MedicalServicesPage());
-                          }, Colors.green),
-                          _adminCard(
-                              context, Icons.devices, "device_management".tr,
+                child:
+                    _isLoading
+                        ? _buildGridShimmer()
+                        : GridView.count(
+                          key: const ValueKey('gridContent'),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          children: [
+                            _adminCard(
+                              context,
+                              Icons.people,
+                              "pilgrims".tr,
                               () {
-                            Get.to(() => const SupervisorCampaignsPage());
-                          }, Colors.orange),
-                        ],
-                      ),
+                                Get.to(() => const UsersListPage());
+                              },
+                              Colors.blue,
+                            ),
+                            _adminCard(
+                              context,
+                              Icons.health_and_safety,
+                              "health_notifications".tr,
+                              () {
+                                Get.to(() => const HealthNotificationsPage());
+                              },
+                              Colors.red,
+                            ),
+                            _adminCard(
+                              context,
+                              Icons.medical_services,
+                              "medical_services".tr,
+                              () {
+                                Get.to(() => MedicalServicesPage());
+                              },
+                              Colors.green,
+                            ),
+                            _adminCard(
+                              context,
+                              Icons.devices,
+                              "device_management".tr,
+                              () {
+                                Get.to(() => const SupervisorCampaignsPage());
+                              },
+                              Colors.orange,
+                            ),
+                          ],
+                        ),
               ),
             ),
             const SizedBox(height: 16),
@@ -277,9 +319,10 @@ class _AdminHomePageState extends State<AdminHomePage>
               padding: const EdgeInsets.all(16),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
-                child: _isLoading
-                    ? _buildHealthStatsShimmer(context)
-                    : _buildHealthStatsCard(context),
+                child:
+                    _isLoading
+                        ? _buildHealthStatsShimmer(context)
+                        : _buildHealthStatsCard(context),
               ),
             ),
             const SizedBox(height: 20),

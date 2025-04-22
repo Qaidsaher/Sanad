@@ -1,7 +1,7 @@
 import 'dart:async'; // For Future
 
-import 'package:autoimagepaper/models/models.dart';
-import 'package:autoimagepaper/screens/admins/dashboard.dart';
+import 'package:sanad/models/models.dart';
+import 'package:sanad/screens/admins/dashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

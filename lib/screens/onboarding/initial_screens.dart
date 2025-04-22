@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:autoimagepaper/screens/onboarding/onboarding_screens.dart';
-import 'package:autoimagepaper/screens/splash.dart';
+import 'package:sanad/screens/onboarding/onboarding_screens.dart';
+import 'package:sanad/screens/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

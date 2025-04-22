@@ -1,8 +1,8 @@
-import 'package:autoimagepaper/models/models.dart'; // Contains Campaign and Pilgrim models
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/models/models.dart'; // Contains Campaign and Pilgrim models
 import 'package:shimmer/shimmer.dart';
 
 class SupervisorCampaignsPage extends StatefulWidget {
@@ -33,8 +33,10 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
           prefixIcon: const Icon(Icons.search),
           filled: true,
           fillColor: Colors.grey.shade200,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 0,
+            horizontal: 20,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
@@ -93,18 +95,17 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("my_campaigns".tr),
-      ),
+      appBar: AppBar(title: Text("my_campaigns".tr)),
       body: Column(
         children: [
           _buildSearchBar(),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('campaigns')
-                  .where('supervisorId', isEqualTo: currentUser?.uid)
-                  .snapshots(),
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('campaigns')
+                      .where('supervisorId', isEqualTo: currentUser?.uid)
+                      .snapshots(),
               builder: (context, campaignSnapshot) {
                 if (campaignSnapshot.connectionState ==
                     ConnectionState.waiting) {
@@ -123,12 +124,15 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
 
                 // Filter campaigns based on search query.
                 if (searchQuery.isNotEmpty) {
-                  campaignDocs = campaignDocs.where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    final campaignName =
-                        (data['campaignName'] ?? '').toString().toLowerCase();
-                    return campaignName.contains(searchQuery);
-                  }).toList();
+                  campaignDocs =
+                      campaignDocs.where((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final campaignName =
+                            (data['campaignName'] ?? '')
+                                .toString()
+                                .toLowerCase();
+                        return campaignName.contains(searchQuery);
+                      }).toList();
                 }
                 if (campaignDocs.isEmpty) {
                   return Center(child: Text("no_campaigns_found".tr));
@@ -136,8 +140,9 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
                 return ListView.builder(
                   itemCount: campaignDocs.length,
                   itemBuilder: (context, index) {
-                    final campaign =
-                        Campaign.fromFirestore(campaignDocs[index]);
+                    final campaign = Campaign.fromFirestore(
+                      campaignDocs[index],
+                    );
 
                     // Format the campaign date.
                     String formattedDate = "N/A";
@@ -150,7 +155,9 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
 
                     return Card(
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -174,15 +181,17 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
                                   child: Text(
                                     campaign.campaignName,
                                     style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 Text(
                                   "${campaign.campaignYear}",
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context).primaryColor),
+                                    fontSize: 16,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -190,13 +199,17 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
                             // Campaign phone number.
                             Row(
                               children: [
-                                Icon(Icons.phone,
-                                    color: Theme.of(context).primaryColor,
-                                    size: 20),
+                                Icon(
+                                  Icons.phone,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 4),
                                 Expanded(
-                                  child: Text("Phone: ${campaign.phone}",
-                                      style: const TextStyle(fontSize: 16)),
+                                  child: Text(
+                                    "Phone: ${campaign.phone}",
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
                                 ),
                               ],
                             ),
@@ -204,23 +217,32 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
                             // Campaign date.
                             Row(
                               children: [
-                                Icon(Icons.calendar_today,
-                                    color: Theme.of(context).primaryColor,
-                                    size: 20),
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 4),
-                                Text("Date: $formattedDate",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: Theme.of(context).primaryColor)),
+                                Text(
+                                  "Date: $formattedDate",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 12),
                             // Pilgrim count for this campaign.
                             StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('pilgrims')
-                                  .where('campaignId', isEqualTo: campaign.id)
-                                  .snapshots(),
+                              stream:
+                                  FirebaseFirestore.instance
+                                      .collection('pilgrims')
+                                      .where(
+                                        'campaignId',
+                                        isEqualTo: campaign.id,
+                                      )
+                                      .snapshots(),
                               builder: (context, pilgrimSnapshot) {
                                 if (pilgrimSnapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -238,15 +260,19 @@ class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
                                     pilgrimSnapshot.data?.docs.length ?? 0;
                                 return Row(
                                   children: [
-                                    Icon(Icons.people,
-                                        color: Theme.of(context).primaryColor,
-                                        size: 20),
+                                    Icon(
+                                      Icons.people,
+                                      color: Theme.of(context).primaryColor,
+                                      size: 20,
+                                    ),
                                     const SizedBox(width: 4),
-                                    Text("$count Pilgrims",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: Theme.of(context)
-                                                .primaryColor)),
+                                    Text(
+                                      "$count Pilgrims",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
                                   ],
                                 );
                               },
