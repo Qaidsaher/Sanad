@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sanad/screens/admins/admin_home.dart';
 import 'package:sanad/screens/admins/dashboard.dart';
 import 'package:sanad/screens/pilgrims/profile/profile.dart';
+import 'package:sanad/screens/supervisors/home.dart';
 
 import 'forgetpassword.dart';
 import 'register.dart';
@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
         if (userType == 'admin') {
           Get.offAll(() => const AdminDashboard());
         } else if (userType == 'supervisor') {
-          Get.offAll(() => const AdminHomePage());
+          Get.offAll(() => const SupervisorHomePage());
         } else if (userType == 'pilgrim') {
           Get.offAll(() => PilgrimProfileScreen());
         }
