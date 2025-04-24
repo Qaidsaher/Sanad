@@ -139,13 +139,8 @@ final ThemeData greenLightTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF388E3C),
       foregroundColor: Colors.white,
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   ),
   textTheme: TextTheme(
@@ -153,20 +148,35 @@ final ThemeData greenLightTheme = ThemeData(
     displayMedium: const TextStyle(color: Colors.black87, fontSize: 45),
     displaySmall: const TextStyle(color: Colors.black87, fontSize: 36),
     headlineLarge: const TextStyle(
-        color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+    ),
     headlineMedium: const TextStyle(
-        color: Colors.black87, fontSize: 28, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+    ),
     headlineSmall: const TextStyle(
-        color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+    ),
     titleLarge: const TextStyle(
-        color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
     titleMedium: const TextStyle(color: Colors.black87, fontSize: 16),
     titleSmall: const TextStyle(color: Colors.black54, fontSize: 14),
     bodyLarge: const TextStyle(color: Colors.black87, fontSize: 16),
     bodyMedium: const TextStyle(color: Colors.black87, fontSize: 14),
     bodySmall: const TextStyle(color: Colors.black54, fontSize: 12),
     labelLarge: const TextStyle(
-        color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+    ),
     labelMedium: const TextStyle(color: Colors.white, fontSize: 14),
     labelSmall: const TextStyle(color: Colors.white, fontSize: 12),
   ),
@@ -194,9 +204,7 @@ final ThemeData greenLightTheme = ThemeData(
   iconTheme: const IconThemeData(color: Color(0xFF388E3C)),
   cardTheme: CardTheme(
     elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   ),
 );
@@ -389,13 +397,8 @@ final ThemeData greenContrastLightTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF2E7D32),
       foregroundColor: Colors.white,
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
@@ -412,20 +415,35 @@ final ThemeData greenContrastLightTheme = ThemeData(
     displayMedium: const TextStyle(color: Colors.black87, fontSize: 45),
     displaySmall: const TextStyle(color: Colors.black87, fontSize: 36),
     headlineLarge: const TextStyle(
-        color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+    ),
     headlineMedium: const TextStyle(
-        color: Colors.black87, fontSize: 28, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+    ),
     headlineSmall: const TextStyle(
-        color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+    ),
     titleLarge: const TextStyle(
-        color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold),
+      color: Colors.black87,
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
     titleMedium: const TextStyle(color: Colors.black87, fontSize: 16),
     titleSmall: const TextStyle(color: Colors.black87, fontSize: 14),
     bodyLarge: const TextStyle(color: Colors.black87, fontSize: 16),
     bodyMedium: const TextStyle(color: Colors.black87, fontSize: 14),
     bodySmall: const TextStyle(color: Colors.black87, fontSize: 12),
     labelLarge: const TextStyle(
-        color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+    ),
     labelMedium: const TextStyle(color: Colors.white, fontSize: 14),
     labelSmall: const TextStyle(color: Colors.white, fontSize: 12),
   ),
@@ -453,9 +471,7 @@ final ThemeData greenContrastLightTheme = ThemeData(
   iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
   cardTheme: CardTheme(
     elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   ),
 );
@@ -479,10 +495,7 @@ final ThemeData greenContrastDarkTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF1B5E20),
       foregroundColor: Colors.white,
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   ),
@@ -498,10 +511,7 @@ final ThemeData greenContrastDarkTheme = ThemeData(
   textTheme: const TextTheme(
     headlineLarge: TextStyle(color: Colors.white, fontSize: 20),
     bodySmall: TextStyle(color: Colors.white70, fontSize: 16),
-  ).apply(
-    bodyColor: Colors.white,
-    displayColor: Colors.white,
-  ),
+  ).apply(bodyColor: Colors.white, displayColor: Colors.white),
   colorScheme: ColorScheme.dark(
     primary: const Color(0xFF1B5E20),
     onPrimary: Colors.white,
@@ -526,9 +536,7 @@ final ThemeData greenContrastDarkTheme = ThemeData(
   iconTheme: const IconThemeData(color: Color(0xFF1B5E20)),
   cardTheme: CardTheme(
     elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   ),
 );

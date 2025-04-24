@@ -20,14 +20,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       isLoading = true;
     });
     try {
-      await _auth.sendPasswordResetEmail(
-        email: _emailController.text.trim(),
+      await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
+      Get.snackbar(
+        "reset_email_sent".tr,
+        "check_your_email".tr,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
-      Get.snackbar("reset_email_sent".tr, "check_your_email".tr,
-          backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
-      Get.snackbar("error".tr, e.toString(),
-          backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+        "error".tr,
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       setState(() {
         isLoading = false;
@@ -44,25 +50,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("forgot_password_title".tr),
-      ),
+      appBar: AppBar(title: Text("forgot_password_title".tr)),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                Icon(Icons.lock_outline,
-                    size: 100, color: Theme.of(context).primaryColor),
+                Icon(
+                  Icons.lock_outline,
+                  size: 100,
+                  color: Theme.of(context).primaryColor,
+                ),
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: "email".tr,
-                    prefixIcon: Icon(Icons.email,
-                        color: Theme.of(context).primaryColor),
+                    prefixIcon: Icon(
+                      Icons.email,
+                      color: Theme.of(context).primaryColor,
+                    ),
                     border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -76,16 +85,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 32),
+                      vertical: 16,
+                      horizontal: 32,
+                    ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white))
-                      : Text("reset_password".tr,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white)),
-                )
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          )
+                          : Text(
+                            "reset_password".tr,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                ),
               ],
             ),
           ),

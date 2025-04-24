@@ -1,15 +1,15 @@
 import 'dart:async'; // For Future
 
-import 'package:sanad/screens/admins/campaigns.dart';
-import 'package:sanad/screens/admins/pilgrims.dart';
-import 'package:sanad/screens/admins/settings.dart';
-import 'package:sanad/screens/admins/smart_bracelet.dart';
-import 'package:sanad/screens/admins/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For SystemNavigator.pop()
 import 'package:get/get.dart';
+import 'package:sanad/screens/admins/campaigns.dart';
+import 'package:sanad/screens/admins/pilgrims.dart';
+import 'package:sanad/screens/admins/settings.dart';
+import 'package:sanad/screens/admins/smart_bracelet.dart';
+import 'package:sanad/screens/admins/users.dart';
 import 'package:shimmer/shimmer.dart';
 // ========================================================================
 
@@ -35,20 +35,24 @@ class ListShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: itemCount,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
-          child: Container(
-            height: 70, // Adjusted height for typical list item
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8.0),
+      itemBuilder:
+          (context, index) => Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(
+                height: 70, // Adjusted height for typical list item
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 }
@@ -101,12 +105,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // Bottom navigation labels and icons
   final List<BottomNavigationBarItem> _navItems = [
     BottomNavigationBarItem(
-        icon: const Icon(Icons.bar_chart), label: 'statistics'.tr),
+      icon: const Icon(Icons.bar_chart),
+      label: 'statistics'.tr,
+    ),
     BottomNavigationBarItem(
-        icon: const Icon(Icons.manage_accounts),
-        label: 'users'.tr), // For Admins/Supervisors
+      icon: const Icon(Icons.manage_accounts),
+      label: 'users'.tr,
+    ), // For Admins/Supervisors
     BottomNavigationBarItem(
-        icon: const Icon(Icons.people_alt), label: 'pilgrims'.tr),
+      icon: const Icon(Icons.people_alt),
+      label: 'pilgrims'.tr,
+    ),
     BottomNavigationBarItem(
       // Added for Bracelets
       icon: const Icon(Icons.watch),
@@ -148,7 +157,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
       // Adjust the route as per your login screen, assuming no dedicated login page for now
       // If you have a login page, navigate to it: Get.offAllNamed('/login');
       Get.snackbar(
-          "Logged Out", "You have been logged out."); // Placeholder feedback
+        "Logged Out",
+        "You have been logged out.",
+      ); // Placeholder feedback
     }
   }
 
@@ -159,8 +170,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         title: Text('adminDashboard'.tr),
         actions: [
           IconButton(
-              onPressed: () => Get.to(new SettingsScreen()),
-              icon: Icon(Icons.settings))
+            onPressed: () => Get.to(new SettingsScreen()),
+            icon: Icon(Icons.settings),
+          ),
         ],
       ),
       body: IndexedStack(
@@ -191,10 +203,11 @@ class StatisticsScreen extends StatelessWidget {
   // Use Firestore aggregate query for counting
   Future<int> _getCount(String collectionName) async {
     try {
-      AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection(collectionName)
-          .count()
-          .get();
+      AggregateQuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection(collectionName)
+              .count()
+              .get();
       return snapshot.count ?? 0;
     } catch (e) {
       print("Error counting $collectionName: $e");
@@ -245,10 +258,11 @@ class _StatisticsViewState extends State<StatisticsView> {
 
   Future<int> _getCount(String collectionName) async {
     try {
-      AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection(collectionName)
-          .count()
-          .get();
+      AggregateQuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection(collectionName)
+              .count()
+              .get();
       return snapshot.count ?? 0;
     } catch (e) {
       print("Error counting $collectionName: $e");
@@ -263,7 +277,11 @@ class _StatisticsViewState extends State<StatisticsView> {
   }
 
   Widget _buildStatCard(
-      String title, int count, IconData icon, BuildContext context) {
+    String title,
+    int count,
+    IconData icon,
+    BuildContext context,
+  ) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -295,7 +313,7 @@ class _StatisticsViewState extends State<StatisticsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Column(
           children: [
             // Expand the main content (grid or shimmers)
@@ -308,8 +326,10 @@ class _StatisticsViewState extends State<StatisticsView> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      children:
-                          List.generate(4, (index) => const StatCardShimmer()),
+                      children: List.generate(
+                        4,
+                        (index) => const StatCardShimmer(),
+                      ),
                     );
                   }
                   if (snapshot.hasError) {
@@ -319,8 +339,9 @@ class _StatisticsViewState extends State<StatisticsView> {
                         children: [
                           Text('errorLoadingStats'.tr + ': ${snapshot.error}'),
                           ElevatedButton(
-                              onPressed: _refreshStats,
-                              child: const Text("Retry"))
+                            onPressed: _refreshStats,
+                            child: const Text("Retry"),
+                          ),
                         ],
                       ),
                     );
@@ -338,14 +359,30 @@ class _StatisticsViewState extends State<StatisticsView> {
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       children: [
-                        _buildStatCard('users'.tr, stats['users']!,
-                            Icons.manage_accounts, context),
-                        _buildStatCard('pilgrims'.tr, stats['pilgrims']!,
-                            Icons.people_alt, context),
-                        _buildStatCard('campaigns'.tr, stats['campaigns']!,
-                            Icons.campaign, context),
-                        _buildStatCard('bracelets'.tr, stats['bracelets']!,
-                            Icons.watch, context),
+                        _buildStatCard(
+                          'users'.tr,
+                          stats['users']!,
+                          Icons.manage_accounts,
+                          context,
+                        ),
+                        _buildStatCard(
+                          'pilgrims'.tr,
+                          stats['pilgrims']!,
+                          Icons.people_alt,
+                          context,
+                        ),
+                        _buildStatCard(
+                          'campaigns'.tr,
+                          stats['campaigns']!,
+                          Icons.campaign,
+                          context,
+                        ),
+                        _buildStatCard(
+                          'bracelets'.tr,
+                          stats['bracelets']!,
+                          Icons.watch,
+                          context,
+                        ),
                       ],
                     ),
                   );

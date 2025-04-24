@@ -1,11 +1,11 @@
 import 'dart:async'; // For Future
 
-import 'package:sanad/models/models.dart';
-import 'package:sanad/screens/admins/dashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth; // Aliased
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/models/models.dart';
+import 'package:sanad/screens/admins/dashboard.dart';
 // ========================================================================
 
 // ========================================================================
@@ -21,15 +21,16 @@ const String healthDataSubcollection = 'health_data';
 // ========================================================================
 // User Management Screens (Normally in screens/user_management/)
 // ========================================================================
-InputDecoration _inputDecoration(String label, IconData icon,
-    {Widget? suffixIcon}) {
+InputDecoration _inputDecoration(
+  String label,
+  IconData icon, {
+  Widget? suffixIcon,
+}) {
   return InputDecoration(
     labelText: label,
     prefixIcon: Icon(icon),
     suffixIcon: suffixIcon,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
   );
 }
 
@@ -52,8 +53,12 @@ class UserListScreen extends StatelessWidget {
           Get.back(); // Close dialog
           final currentUserUid = fb_auth.FirebaseAuth.instance.currentUser?.uid;
           if (currentUserUid == user.id) {
-            Get.snackbar('error'.tr, 'cannotDeleteSelf'.tr,
-                backgroundColor: Colors.orangeAccent, colorText: Colors.black);
+            Get.snackbar(
+              'error'.tr,
+              'cannotDeleteSelf'.tr,
+              backgroundColor: Colors.orangeAccent,
+              colorText: Colors.black,
+            );
             return;
           }
           try {
@@ -61,14 +66,19 @@ class UserListScreen extends StatelessWidget {
                 .collection(usersCollection)
                 .doc(user.id)
                 .delete();
-            Get.snackbar('success'.tr, 'userDeletedSuccess'.tr,
-                snackPosition: SnackPosition.BOTTOM);
+            Get.snackbar(
+              'success'.tr,
+              'userDeletedSuccess'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+            );
             // Consider triggering a Cloud Function here to delete the Auth user
           } catch (e) {
             Get.snackbar(
-                'error'.tr, "${'errorDeletingUser'.tr}: ${e.toString()}",
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.redAccent);
+              'error'.tr,
+              "${'errorDeletingUser'.tr}: ${e.toString()}",
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+            );
           }
         },
         style: ElevatedButton.styleFrom(
@@ -96,10 +106,11 @@ class UserListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(usersCollection)
-            .orderBy('username')
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection(usersCollection)
+                .orderBy('username')
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const ListShimmer();
@@ -119,26 +130,32 @@ class UserListScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: ListTile(
                   leading: CircleAvatar(
-                      child: Text(user.role.isNotEmpty
-                          ? user.role[0].toUpperCase()
-                          : '?')),
+                    child: Text(
+                      user.role.isNotEmpty ? user.role[0].toUpperCase() : '?',
+                    ),
+                  ),
                   title: Text(user.username),
-                  subtitle:
-                      Text("${user.email}\n${'role'.tr}: ${user.role.tr}"),
+                  subtitle: Text(
+                    "${user.email}\n${'role'.tr}: ${user.role.tr}",
+                  ),
                   isThreeLine: true,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined,
-                            color: Colors.orange),
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          color: Colors.orange,
+                        ),
                         tooltip: 'editUser'.tr,
-                        onPressed: () =>
-                            Get.to(() => EditUserScreen(user: user)),
+                        onPressed:
+                            () => Get.to(() => EditUserScreen(user: user)),
                       ),
                       IconButton(
-                        icon:
-                            const Icon(Icons.delete_outline, color: Colors.red),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
                         tooltip: 'deleteUser'.tr,
                         onPressed: () => _confirmDeleteUser(context, user),
                       ),
@@ -198,16 +215,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
     try {
       fb_auth.UserCredential userCredential = await fb_auth
-          .FirebaseAuth.instance
+          .FirebaseAuth
+          .instance
           .createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         final uid = userCredential.user!.uid;
         UserModel newUser = UserModel(
-            id: uid,
-            username: username,
-            email: email,
-            phone: phone,
-            role: role);
+          id: uid,
+          username: username,
+          email: email,
+          phone: phone,
+          role: role,
+        );
 
         await FirebaseFirestore.instance
             .collection(usersCollection)
@@ -229,22 +248,31 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         // Delay for 2 seconds so the snackbar is visible, then go back
         Get.back();
       } else {
-        Get.snackbar('error'.tr, "Firebase Auth user creation failed silently.",
-            snackPosition: SnackPosition.BOTTOM,
-            colorText: Colors.white,
-            backgroundColor: Colors.redAccent);
+        Get.snackbar(
+          'error'.tr,
+          "Firebase Auth user creation failed silently.",
+          snackPosition: SnackPosition.BOTTOM,
+          colorText: Colors.white,
+          backgroundColor: Colors.redAccent,
+        );
         throw Exception("Firebase Auth user creation failed silently.");
       }
     } on fb_auth.FirebaseAuthException catch (e) {
-      Get.snackbar('error'.tr, '${'firebaseAuthError'.tr}: ${e.message}',
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-          backgroundColor: Colors.redAccent);
+      Get.snackbar(
+        'error'.tr,
+        '${'firebaseAuthError'.tr}: ${e.message}',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.redAccent,
+      );
     } catch (e) {
-      Get.snackbar('error'.tr, '${'errorCreatingUser'.tr}: ${e.toString()}',
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-          backgroundColor: Colors.redAccent);
+      Get.snackbar(
+        'error'.tr,
+        '${'errorCreatingUser'.tr}: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.redAccent,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -261,56 +289,78 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           child: Column(
             children: [
               TextFormField(
-                  controller: _usernameController,
-                  decoration: _inputDecoration('username'.tr, Icons.person),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _usernameController,
+                decoration: _inputDecoration('username'.tr, Icons.person),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _emailController,
-                  decoration: _inputDecoration('email'.tr, Icons.email),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) => v!.isEmpty
-                      ? 'requiredField'.tr
-                      : (!GetUtils.isEmail(v) ? 'invalidEmail'.tr : null)),
+                controller: _emailController,
+                decoration: _inputDecoration('email'.tr, Icons.email),
+                keyboardType: TextInputType.emailAddress,
+                validator:
+                    (v) =>
+                        v!.isEmpty
+                            ? 'requiredField'.tr
+                            : (!GetUtils.isEmail(v) ? 'invalidEmail'.tr : null),
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _phoneController,
-                  decoration: _inputDecoration('phone'.tr, Icons.phone),
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _phoneController,
+                decoration: _inputDecoration('phone'.tr, Icons.phone),
+                keyboardType: TextInputType.phone,
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: _inputDecoration('password'.tr, Icons.lock,
-                      suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword))),
-                  validator: (v) => v!.isEmpty
-                      ? 'requiredField'.tr
-                      : (v.length < 6 ? 'passwordTooShort'.tr : null)),
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: _inputDecoration(
+                  'password'.tr,
+                  Icons.lock,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed:
+                        () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                  ),
+                ),
+                validator:
+                    (v) =>
+                        v!.isEmpty
+                            ? 'requiredField'.tr
+                            : (v.length < 6 ? 'passwordTooShort'.tr : null),
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                  value: _selectedRole,
-                  decoration: _inputDecoration('role'.tr, Icons.security),
-                  items: [
-                    DropdownMenuItem(value: 'admin', child: Text('admin'.tr)),
-                    DropdownMenuItem(
-                        value: 'supervisor', child: Text('supervisor'.tr))
-                  ],
-                  onChanged: (v) => setState(() => _selectedRole = v!),
-                  validator: (v) => v == null ? 'requiredField'.tr : null),
+                value: _selectedRole,
+                decoration: _inputDecoration('role'.tr, Icons.security),
+                items: [
+                  DropdownMenuItem(value: 'admin', child: Text('admin'.tr)),
+                  DropdownMenuItem(
+                    value: 'supervisor',
+                    child: Text('supervisor'.tr),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _selectedRole = v!),
+                validator: (v) => v == null ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50)),
-                  onPressed: _isLoading ? null : _createUser,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text('create'.tr)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                onPressed: _isLoading ? null : _createUser,
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('create'.tr),
+              ),
             ],
           ),
         ),
@@ -358,19 +408,26 @@ class _EditUserScreenState extends State<EditUserScreen> {
       Map<String, dynamic> updateData = {
         'username': _usernameController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'role': _selectedRole
+        'role': _selectedRole,
       };
       await FirebaseFirestore.instance
           .collection(usersCollection)
           .doc(widget.user.id)
           .update(updateData);
-      Get.snackbar('success'.tr, 'userUpdatedSuccess'.tr,
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+      Get.snackbar(
+        'success'.tr,
+        'userUpdatedSuccess'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+      );
       Get.back();
     } catch (e) {
-      Get.snackbar('error'.tr, '${'errorUpdatingUser'.tr}: ${e.toString()}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent);
+      Get.snackbar(
+        'error'.tr,
+        '${'errorUpdatingUser'.tr}: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -387,41 +444,53 @@ class _EditUserScreenState extends State<EditUserScreen> {
           child: Column(
             children: [
               Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: TextFormField(
-                      initialValue: widget.user.email,
-                      decoration: _inputDecoration('email'.tr, Icons.email)
-                          .copyWith(filled: true, fillColor: Colors.grey[200]),
-                      readOnly: true)),
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: TextFormField(
+                  initialValue: widget.user.email,
+                  decoration: _inputDecoration(
+                    'email'.tr,
+                    Icons.email,
+                  ).copyWith(filled: true, fillColor: Colors.grey[200]),
+                  readOnly: true,
+                ),
+              ),
               TextFormField(
-                  controller: _usernameController,
-                  decoration: _inputDecoration('username'.tr, Icons.person),
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _usernameController,
+                decoration: _inputDecoration('username'.tr, Icons.person),
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               TextFormField(
-                  controller: _phoneController,
-                  decoration: _inputDecoration('phone'.tr, Icons.phone),
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => v!.isEmpty ? 'requiredField'.tr : null),
+                controller: _phoneController,
+                decoration: _inputDecoration('phone'.tr, Icons.phone),
+                keyboardType: TextInputType.phone,
+                validator: (v) => v!.isEmpty ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                  value: _selectedRole,
-                  decoration: _inputDecoration('role'.tr, Icons.security),
-                  items: [
-                    DropdownMenuItem(value: 'admin', child: Text('admin'.tr)),
-                    DropdownMenuItem(
-                        value: 'supervisor', child: Text('supervisor'.tr))
-                  ],
-                  onChanged: (v) => setState(() => _selectedRole = v!),
-                  validator: (v) => v == null ? 'requiredField'.tr : null),
+                value: _selectedRole,
+                decoration: _inputDecoration('role'.tr, Icons.security),
+                items: [
+                  DropdownMenuItem(value: 'admin', child: Text('admin'.tr)),
+                  DropdownMenuItem(
+                    value: 'supervisor',
+                    child: Text('supervisor'.tr),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _selectedRole = v!),
+                validator: (v) => v == null ? 'requiredField'.tr : null,
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50)),
-                  onPressed: _isLoading ? null : _updateUser,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text('update'.tr)),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                onPressed: _isLoading ? null : _updateUser,
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('update'.tr),
+              ),
               // Optional: Password Reset Button
               // TextButton(onPressed: () async { try { await fb_auth.FirebaseAuth.instance.sendPasswordResetEmail(email: widget.user.email); Get.snackbar("Success", "Password reset email sent to ${widget.user.email}"); } catch (e) { Get.snackbar("Error", "Failed to send reset email: $e"); } }, child: Text("Send Password Reset Email")),
             ],

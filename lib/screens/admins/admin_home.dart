@@ -260,7 +260,7 @@ class _AdminHomePageState extends State<AdminHomePage>
           children: [
             const SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child:
@@ -316,7 +316,7 @@ class _AdminHomePageState extends State<AdminHomePage>
             ),
             const SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child:

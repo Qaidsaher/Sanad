@@ -60,8 +60,9 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 
   Future<void> _pickAvatar() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       setState(() {
         _avatarFile = File(pickedFile.path);
@@ -82,11 +83,11 @@ class _RegisterScreenState extends State<RegisterScreen>
       await _animationController.forward();
 
       // Register with email and password
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
       User? user = userCredential.user;
       if (user == null) throw Exception("User registration failed");
 
@@ -115,13 +116,21 @@ class _RegisterScreenState extends State<RegisterScreen>
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      Get.snackbar("register_success".tr, "welcome".tr,
-          backgroundColor: Colors.green, colorText: Colors.white);
+      Get.snackbar(
+        "register_success".tr,
+        "welcome".tr,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
 
       Get.off(() => const LoginScreen());
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("register_error".tr, e.message ?? "error_occurred".tr,
-          backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+        "register_error".tr,
+        e.message ?? "error_occurred".tr,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       setState(() => isLoading = false);
       _animationController.reverse();
@@ -134,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       appBar: AppBar(title: Text("register_title".tr)),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
@@ -143,10 +152,11 @@ class _RegisterScreenState extends State<RegisterScreen>
                   onTap: _pickAvatar,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: _avatarFile != null
-                        ? FileImage(_avatarFile!)
-                        : const AssetImage("assets/avatar.png")
-                            as ImageProvider,
+                    backgroundImage:
+                        _avatarFile != null
+                            ? FileImage(_avatarFile!)
+                            : const AssetImage("assets/avatar.png")
+                                as ImageProvider,
                   ),
                 ),
                 TextButton(
@@ -155,21 +165,41 @@ class _RegisterScreenState extends State<RegisterScreen>
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
-                    "name".tr, _nameController, Icons.person, "enter_name".tr),
-                const SizedBox(height: 16),
-                _buildTextField("email".tr, _emailController, Icons.email,
-                    "enter_email".tr),
-                const SizedBox(height: 16),
-                _buildTextField("password".tr, _passwordController, Icons.lock,
-                    "enter_password".tr,
-                    obscure: true),
-                const SizedBox(height: 16),
-                _buildTextField("country".tr, _countryController, Icons.flag,
-                    "enter_country".tr),
+                  "name".tr,
+                  _nameController,
+                  Icons.person,
+                  "enter_name".tr,
+                ),
                 const SizedBox(height: 16),
                 _buildTextField(
-                    "age".tr, _ageController, Icons.cake, "enter_age".tr,
-                    inputType: TextInputType.number),
+                  "email".tr,
+                  _emailController,
+                  Icons.email,
+                  "enter_email".tr,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  "password".tr,
+                  _passwordController,
+                  Icons.lock,
+                  "enter_password".tr,
+                  obscure: true,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  "country".tr,
+                  _countryController,
+                  Icons.flag,
+                  "enter_country".tr,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  "age".tr,
+                  _ageController,
+                  Icons.cake,
+                  "enter_age".tr,
+                  inputType: TextInputType.number,
+                ),
                 const SizedBox(height: 24),
                 GestureDetector(
                   onTap: _register,
@@ -183,14 +213,20 @@ class _RegisterScreenState extends State<RegisterScreen>
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
-                        child: isLoading
-                            ? const CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
-                              )
-                            : Text("register".tr,
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.white)),
+                        child:
+                            isLoading
+                                ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                )
+                                : Text(
+                                  "register".tr,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                       ),
                     ),
                   ),
@@ -199,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                 TextButton(
                   onPressed: () => Get.to(() => const LoginScreen()),
                   child: Text("already_account".tr),
-                )
+                ),
               ],
             ),
           ),
@@ -208,9 +244,14 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      IconData icon, String validationMessage,
-      {bool obscure = false, TextInputType inputType = TextInputType.text}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    IconData icon,
+    String validationMessage, {
+    bool obscure = false,
+    TextInputType inputType = TextInputType.text,
+  }) {
     return TextFormField(
       controller: controller,
       obscureText: obscure,

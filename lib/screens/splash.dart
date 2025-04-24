@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:sanad/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/screens/auth/login.dart';
 
 /// ------------------------
 /// SPLASH SCREEN
@@ -24,9 +24,10 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _controller.forward();
     Timer(const Duration(seconds: 4), () {
       // After splash, navigate to LoginScreen (your auth flow)
