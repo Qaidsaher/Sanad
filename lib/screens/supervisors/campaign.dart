@@ -5,15 +5,15 @@ import 'package:get/get.dart';
 import 'package:sanad/models/models.dart'; // Contains Campaign and Pilgrim models
 import 'package:shimmer/shimmer.dart';
 
-class SupervisorCampaignsPage extends StatefulWidget {
-  const SupervisorCampaignsPage({Key? key}) : super(key: key);
+class CampaignsPage extends StatefulWidget {
+  const CampaignsPage({Key? key}) : super(key: key);
 
   @override
-  State<SupervisorCampaignsPage> createState() =>
-      _SupervisorCampaignsPageState();
+  State<CampaignsPage> createState() =>
+      _CampaignsPageState();
 }
 
-class _SupervisorCampaignsPageState extends State<SupervisorCampaignsPage> {
+class _CampaignsPageState extends State<CampaignsPage> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = "";
 

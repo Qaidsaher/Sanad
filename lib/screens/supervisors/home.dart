@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// Make sure this import points to your actual campaigns page
-import 'package:sanad/screens/admins/campaig.dart';
-import 'package:sanad/screens/admins/health_notifications.dart';
-import 'package:sanad/screens/admins/medical_services.dart';
 import 'package:sanad/screens/admins/settings.dart';
-import 'package:sanad/screens/admins/users_list.dart';
+// Make sure this import points to your actual campaigns page
+import 'package:sanad/screens/supervisors/campaign.dart';
+import 'package:sanad/screens/supervisors/health_notifications.dart';
+import 'package:sanad/screens/supervisors/medical_services.dart';
+import 'package:sanad/screens/supervisors/pilgrams.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SupervisorHomePage extends StatefulWidget {
@@ -423,7 +423,7 @@ class _SupervisorHomePageState extends State<SupervisorHomePage>
                               context,
                               Icons.people_outline, // Outlined icon
                               "pilgrims".tr,
-                              () => Get.to(() => const UsersListPage()),
+                              () => Get.to(() => const PilgramsListPage()),
                               Colors.blueAccent.shade400,
                             ),
                             _adminCard(
@@ -431,8 +431,7 @@ class _SupervisorHomePageState extends State<SupervisorHomePage>
                               Icons
                                   .monitor_heart_outlined, // More specific health icon
                               "health_notifications".tr,
-                              () =>
-                                  Get.to(() => const HealthNotificationsPage()),
+                              () => Get.to(() => const NotificationsScreen()),
                               Colors.redAccent.shade200, // Consistent red
                             ),
                             _adminCard(
@@ -447,7 +446,7 @@ class _SupervisorHomePageState extends State<SupervisorHomePage>
                               Icons.campaign_outlined, // ** CHANGED ICON **
                               "campaigns".tr, // ** CHANGED LABEL **
                               () => Get.to(
-                                () => const SupervisorCampaignsPage(),
+                                () => const CampaignsPage(),
                               ), // Ensure this page exists
                               Colors.orange.shade600,
                             ),

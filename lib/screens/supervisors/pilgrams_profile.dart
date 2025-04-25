@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:sanad/models/models.dart'; // Contains the Pilgrim and Campaign models.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/models/models.dart'; // Contains the Pilgrim and Campaign models.
 import 'package:shimmer/shimmer.dart';
 
 /// Safely parses an integer; returns [defaultValue] if conversion fails.
@@ -26,15 +26,15 @@ double parseDouble(dynamic value, [double defaultValue = 36.5]) {
   return defaultValue;
 }
 
-class UserProfileAdmin extends StatefulWidget {
+class PilgramProfile extends StatefulWidget {
   final Pilgrim pilgrim;
-  const UserProfileAdmin({Key? key, required this.pilgrim}) : super(key: key);
+  const PilgramProfile({Key? key, required this.pilgrim}) : super(key: key);
 
   @override
-  _UserProfileAdminState createState() => _UserProfileAdminState();
+  _PilgramProfileState createState() => _PilgramProfileState();
 }
 
-class _UserProfileAdminState extends State<UserProfileAdmin> {
+class _PilgramProfileState extends State<PilgramProfile> {
   bool _isLoading = true;
 
   @override
@@ -50,7 +50,11 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
 
   /// A helper widget to create an info tile.
   Widget _infoTile(
-      IconData icon, String label, String value, BuildContext context) {
+    IconData icon,
+    String label,
+    String value,
+    BuildContext context,
+  ) {
     return ListTile(
       leading: Icon(icon, color: Theme.of(context).primaryColor, size: 30),
       title: Text(label, style: Theme.of(context).textTheme.bodyLarge),
@@ -61,10 +65,11 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
   /// Fetches the campaign data using the pilgrim's campaignId.
   Future<Campaign?> _getCampaign() async {
     if (widget.pilgrim.campaignId.isEmpty) return null;
-    DocumentSnapshot doc = await FirebaseFirestore.instance
-        .collection('campaigns')
-        .doc(widget.pilgrim.campaignId)
-        .get();
+    DocumentSnapshot doc =
+        await FirebaseFirestore.instance
+            .collection('campaigns')
+            .doc(widget.pilgrim.campaignId)
+            .get();
     if (doc.exists) {
       return Campaign.fromFirestore(doc);
     }
@@ -93,11 +98,7 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Shimmer.fromColors(
               baseColor: Colors.grey.shade300,
               highlightColor: Colors.grey.shade100,
-              child: Container(
-                height: 24,
-                width: 200,
-                color: Colors.white,
-              ),
+              child: Container(height: 24, width: 200, color: Colors.white),
             ),
           ),
           const SizedBox(height: 6),
@@ -105,11 +106,7 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Shimmer.fromColors(
               baseColor: Colors.grey.shade300,
               highlightColor: Colors.grey.shade100,
-              child: Container(
-                height: 16,
-                width: 150,
-                color: Colors.white,
-              ),
+              child: Container(height: 16, width: 150, color: Colors.white),
             ),
           ),
           const SizedBox(height: 16),
@@ -120,11 +117,9 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              child: Container(
-                height: 120,
-                padding: const EdgeInsets.all(16),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Container(height: 120, padding: const EdgeInsets.all(16)),
             ),
           ),
           const SizedBox(height: 16),
@@ -135,11 +130,9 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              child: Container(
-                height: 100,
-                padding: const EdgeInsets.all(16),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Container(height: 100, padding: const EdgeInsets.all(16)),
             ),
           ),
           const SizedBox(height: 16),
@@ -150,11 +143,9 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              child: Container(
-                height: 120,
-                padding: const EdgeInsets.all(16),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Container(height: 120, padding: const EdgeInsets.all(16)),
             ),
           ),
           const SizedBox(height: 16),
@@ -165,11 +156,9 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              child: Container(
-                height: 80,
-                padding: const EdgeInsets.all(16),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Container(height: 80, padding: const EdgeInsets.all(16)),
             ),
           ),
         ],
@@ -180,13 +169,14 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
   /// Builds a Health Information Card with realtime updates.
   Widget _buildHealthInfoCard(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('pilgrims')
-          .doc(widget.pilgrim.id)
-          .collection('health_data')
-          .orderBy('timestamp', descending: true)
-          .limit(1)
-          .snapshots(),
+      stream:
+          FirebaseFirestore.instance
+              .collection('pilgrims')
+              .doc(widget.pilgrim.id)
+              .collection('health_data')
+              .orderBy('timestamp', descending: true)
+              .limit(1)
+              .snapshots(),
       builder: (context, snapshot) {
         int heartRate = 75;
         double temperature = 36.5;
@@ -206,23 +196,39 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
             // In case of error, the default values are used.
           }
         }
-        final String gpsLocationText = (location.latitude == 21.4225 &&
-                location.longitude == 39.8262)
-            ? "Mecca, Saudi Arabia"
-            : "Lat: ${location.latitude.toStringAsFixed(4)}, Lng: ${location.longitude.toStringAsFixed(4)}";
+        final String gpsLocationText =
+            (location.latitude == 21.4225 && location.longitude == 39.8262)
+                ? "Mecca, Saudi Arabia"
+                : "Lat: ${location.latitude.toStringAsFixed(4)}, Lng: ${location.longitude.toStringAsFixed(4)}";
         return Card(
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Column(
             children: [
               _infoTile(
-                  Icons.favorite, "heart_rate".tr, "$heartRate bpm", context),
-              _infoTile(Icons.thermostat, "temperature".tr,
-                  "${temperature.toStringAsFixed(1)}°C", context),
-              _infoTile(Icons.bloodtype, "blood_oxygen".tr,
-                  "${bloodOxygen.toStringAsFixed(0)}%", context),
-              _infoTile(Icons.location_on, "gps_location".tr, gpsLocationText,
-                  context),
+                Icons.favorite,
+                "heart_rate".tr,
+                "$heartRate bpm",
+                context,
+              ),
+              _infoTile(
+                Icons.thermostat,
+                "temperature".tr,
+                "${temperature.toStringAsFixed(1)}°C",
+                context,
+              ),
+              _infoTile(
+                Icons.bloodtype,
+                "blood_oxygen".tr,
+                "${bloodOxygen.toStringAsFixed(0)}%",
+                context,
+              ),
+              _infoTile(
+                Icons.location_on,
+                "gps_location".tr,
+                gpsLocationText,
+                context,
+              ),
             ],
           ),
         );
@@ -246,17 +252,13 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("pilgrim_profile".tr),
-        ),
+        appBar: AppBar(title: Text("pilgrim_profile".tr)),
         body: _buildShimmerScreen(context),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("pilgrim_profile".tr),
-      ),
+      appBar: AppBar(title: Text("pilgrim_profile".tr)),
       body: FutureBuilder<Campaign?>(
         future: _getCampaign(),
         builder: (context, campaignSnapshot) {
@@ -279,7 +281,9 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
                         ? widget.pilgrim.fullName
                         : "N/A",
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -294,78 +298,120 @@ class _UserProfileAdminState extends State<UserProfileAdmin> {
                 Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Column(
                     children: [
-                      _infoTile(Icons.flag, "country".tr,
-                          widget.pilgrim.country, context),
-                      _infoTile(Icons.cake, "age".tr,
-                          "${widget.pilgrim.age} yrs", context),
+                      _infoTile(
+                        Icons.flag,
+                        "country".tr,
+                        widget.pilgrim.country,
+                        context,
+                      ),
+                      _infoTile(
+                        Icons.cake,
+                        "age".tr,
+                        "${widget.pilgrim.age} yrs",
+                        context,
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 // Campaign Information Section
-                Text("campaign_info".tr,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  "campaign_info".tr,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 campaignSnapshot.connectionState == ConnectionState.waiting
                     ? _buildShimmerScreen(context)
                     : campaign != null
-                        ? Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Column(
-                              children: [
-                                _infoTile(
-                                    Icons.campaign,
-                                    "campaign".tr,
-                                    "${campaign.campaignName} (${campaign.campaignYear})",
-                                    context),
-                                _infoTile(Icons.phone, "campaign_phone".tr,
-                                    campaign.phone, context),
-                              ],
-                            ),
-                          )
-                        : Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Text("no_campaign_data".tr,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      Theme.of(context).textTheme.bodyMedium),
-                            ),
+                    ? Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          _infoTile(
+                            Icons.campaign,
+                            "campaign".tr,
+                            "${campaign.campaignName} (${campaign.campaignYear})",
+                            context,
                           ),
+                          _infoTile(
+                            Icons.phone,
+                            "campaign_phone".tr,
+                            campaign.phone,
+                            context,
+                          ),
+                        ],
+                      ),
+                    )
+                    : Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Text(
+                          "no_campaign_data".tr,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ),
                 const SizedBox(height: 16),
                 // Health Information Section with Realtime Updates
-                Text("health_info".tr,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  "health_info".tr,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 _buildHealthInfoCard(context),
                 const SizedBox(height: 16),
                 // Device Information Section
-                Text("device_info".tr,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  "device_info".tr,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Column(
                     children: [
-                      _infoTile(Icons.battery_charging_full, "battery_level".tr,
-                          "85%", context),
-                      _infoTile(Icons.bluetooth_connected,
-                          "connection_status".tr, "Connected", context),
                       _infoTile(
-                          Icons.watch, "device_id".tr, "HC-1234", context),
+                        Icons.battery_charging_full,
+                        "battery_level".tr,
+                        "85%",
+                        context,
+                      ),
+                      _infoTile(
+                        Icons.bluetooth_connected,
+                        "connection_status".tr,
+                        "Connected",
+                        context,
+                      ),
+                      _infoTile(
+                        Icons.watch,
+                        "device_id".tr,
+                        "HC-1234",
+                        context,
+                      ),
                     ],
                   ),
                 ),
