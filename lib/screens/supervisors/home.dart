@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+// Make sure this import points to your actual campaigns page
 import 'package:sanad/screens/admins/campaig.dart';
 import 'package:sanad/screens/admins/health_notifications.dart';
 import 'package:sanad/screens/admins/medical_services.dart';
@@ -14,67 +15,101 @@ class SupervisorHomePage extends StatefulWidget {
   const SupervisorHomePage({Key? key}) : super(key: key);
 
   @override
-  State<SupervisorHomePage> createState() => _AdminHomePageState();
+  State<SupervisorHomePage> createState() => _SupervisorHomePageState();
 }
 
-class _AdminHomePageState extends State<SupervisorHomePage>
+class _SupervisorHomePageState extends State<SupervisorHomePage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+  // Removed animation controller as it wasn't actively used beyond initial forward
+  // If you need animations, you can re-add it.
   bool _isLoading = true;
-
-  // Random statistics for demonstration
   int emergencyCount = 0;
   int warningCount = 0;
+  final Random _random = Random(); // Reuse Random instance
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _animationController.forward();
+    _loadInitialData();
+  }
 
-    // Generate random stats
-    emergencyCount = Random().nextInt(10);
-    warningCount = Random().nextInt(15);
+  // Function to simulate loading and set initial data
+  Future<void> _loadInitialData() async {
+    // Set initial counts
+    _updateCountsInternal();
 
-    // Simulate a loading delay for 4 seconds
-    Future.delayed(const Duration(seconds: 4), () {
+    // Simulate network delay or data fetching
+    await Future.delayed(const Duration(seconds: 2)); // Reduced delay slightly
+
+    if (mounted) {
+      // Check if the widget is still in the tree
       setState(() {
         _isLoading = false;
       });
-    });
+    }
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
+  // Function to update counts (can be called externally if needed)
+  void _updateCounts() {
+    if (mounted) {
+      setState(() {
+        _updateCountsInternal();
+      });
+      // Optional: Show a snackbar feedback
+      Get.snackbar(
+        "Stats Updated",
+        "Emergency and Warning counts refreshed.",
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.green.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+    }
   }
 
-  /// Account menu: displays logout and delete account actions using a settings icon.
+  // Internal helper to avoid duplicating random logic
+  void _updateCountsInternal() {
+    emergencyCount = _random.nextInt(10); // Max 9 emergencies
+    warningCount = _random.nextInt(15); // Max 14 warnings
+  }
+
+  // --- Menu ---
   Widget _buildAccountMenu(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert, color: Colors.white),
+      icon: const Icon(
+        Icons.account_circle_outlined,
+        size: 28,
+      ), // More modern user icon
+      tooltip: "Account Options", // Accessibility
       itemBuilder:
           (context) => [
             PopupMenuItem(
               value: "logout",
-              child: ListTile(
-                leading: const Icon(Icons.logout),
-                title: Text("logout".tr),
+              child: Row(
+                // Use Row for better layout control
+                children: [
+                  Icon(Icons.logout_outlined, color: Colors.redAccent.shade200),
+                  const SizedBox(width: 12),
+                  Text("logout".tr),
+                ],
               ),
             ),
             PopupMenuItem(
               value: "delete",
-              child: ListTile(
-                leading: const Icon(Icons.delete_forever),
-                title: Text("delete_account".tr),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.delete_forever_outlined,
+                    color: Colors.red.shade700,
+                  ),
+                  const SizedBox(width: 12),
+                  Text("delete_account".tr),
+                ],
               ),
             ),
           ],
       onSelected: (value) async {
+        // (Keep your existing logout/delete logic here)
         if (value == "logout") {
           await FirebaseAuth.instance.signOut();
           Get.offAllNamed('/login');
@@ -100,9 +135,11 @@ class _AdminHomePageState extends State<SupervisorHomePage>
                   ],
                 ),
           );
-          if (confirmed) {
+          if (confirmed == true) {
+            // Explicit check for true
             try {
-              await FirebaseAuth.instance.currentUser!.delete();
+              await FirebaseAuth.instance.currentUser
+                  ?.delete(); // Use null-safe operator
               Get.offAllNamed('/login');
               Get.snackbar(
                 "account_deleted".tr,
@@ -110,10 +147,28 @@ class _AdminHomePageState extends State<SupervisorHomePage>
                 backgroundColor: Colors.green,
                 colorText: Colors.white,
               );
-            } catch (e) {
+            } on FirebaseAuthException catch (e) {
+              // Catch specific exception
+              String errorMessage = e.message ?? "An unknown error occurred.";
+              // Handle common errors like 'requires-recent-login'
+              if (e.code == 'requires-recent-login') {
+                errorMessage =
+                    "Please log out and log back in to delete your account.";
+              }
               Get.snackbar(
                 "delete_error".tr,
-                e.toString(),
+                errorMessage,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+                duration: const Duration(
+                  seconds: 5,
+                ), // Longer duration for error
+              );
+            } catch (e) {
+              // Catch general errors
+              Get.snackbar(
+                "delete_error".tr,
+                "An unexpected error occurred: ${e.toString()}",
                 backgroundColor: Colors.red,
                 colorText: Colors.white,
               );
@@ -124,18 +179,35 @@ class _AdminHomePageState extends State<SupervisorHomePage>
     );
   }
 
-  // Health stats card with emergency and warning counts.
+  // --- Health Stats ---
   Widget _buildHealthStatsCard(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      // Use Card for elevation and shape
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _statusStat(context, Icons.error, "emergency".tr, emergencyCount),
-            _statusStat(context, Icons.warning, "warning".tr, warningCount),
+            _statusStat(
+              context,
+              Icons.error_outline, // Use outlined icon
+              "emergency".tr,
+              emergencyCount,
+              Colors.redAccent.shade200,
+            ),
+            _statusStat(
+              context,
+              Icons.warning_amber_rounded, // Use outlined icon
+              "warning".tr,
+              warningCount,
+              Colors.orangeAccent.shade400,
+            ),
           ],
         ),
       ),
@@ -147,64 +219,91 @@ class _AdminHomePageState extends State<SupervisorHomePage>
     IconData icon,
     String label,
     int count,
+    Color color,
   ) {
+    final textTheme = Theme.of(context).textTheme;
+    final onPrimaryContainer = Theme.of(context).colorScheme.onPrimaryContainer;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
-          backgroundColor: icon == Icons.error ? Colors.red : Colors.orange,
-          child: Icon(icon, color: Colors.white),
+          // Use CircleAvatar for standard circular background
+          radius: 28,
+          backgroundColor: color.withOpacity(0.15),
+          child: Icon(icon, size: 30, color: color),
         ),
-        const SizedBox(height: 8),
-        Text("$count", style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 12),
+        Text(
+          "$count",
+          style: textTheme.headlineMedium?.copyWith(
+            // Slightly larger headline
+            color: color, // Use text color appropriate for container
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          label,
+          style: textTheme.bodyMedium?.copyWith(color: color.withOpacity(0.8)),
+        ),
       ],
     );
   }
 
-  // Grid card for each admin dashboard option.
+  // --- Admin Grid Card ---
   Widget _adminCard(
     BuildContext context,
     IconData icon,
     String label,
     VoidCallback onTap,
-    Color color,
+    Color iconColor,
   ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 50, color: color),
-            const SizedBox(height: 10),
-            Text(label, style: const TextStyle(fontSize: 18)),
-          ],
-        ),
-      ),
-    );
-  }
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-  // Shimmer placeholder for grid items.
-  Widget _buildGridShimmerItem() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 4,
-        child: Container(
-          padding: const EdgeInsets.all(16),
+    return Card(
+      // Use Card widget
+      elevation: 2, // Softer elevation
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.all(8), // Consistent margin
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16), // Match Card shape
+        splashColor: iconColor.withOpacity(0.1), // Themed splash
+        highlightColor: iconColor.withOpacity(0.05), // Themed highlight
+        child: Padding(
+          padding: const EdgeInsets.all(16), // Increased padding
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(width: 50, height: 50, color: Colors.white),
-              const SizedBox(height: 10),
-              Container(width: 80, height: 20, color: Colors.white),
+              CircleAvatar(
+                // Consistent circle for icon
+                radius: 30,
+                backgroundColor: iconColor.withOpacity(0.1),
+                child: Icon(icon, size: 30, color: iconColor),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                // Allow text to wrap if needed
+                child: Text(
+                  label,
+                  style: textTheme.titleMedium?.copyWith(
+                    // Use themed text style
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Icon(
+                Icons.arrow_forward_ios_rounded, // Slightly different arrow
+                size: 18,
+                color: Colors.grey.shade500,
+              ),
             ],
           ),
         ),
@@ -212,29 +311,54 @@ class _AdminHomePageState extends State<SupervisorHomePage>
     );
   }
 
-  // Shimmer grid for admin cards.
+  // --- Shimmer Placeholders ---
+  Widget _buildGridShimmerItem() {
+    return Card(
+      margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white, // Shimmer needs a solid background
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildGridShimmer() {
     return GridView.count(
       key: const ValueKey('gridShimmer'),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: 4, // Reduced spacing slightly
+      mainAxisSpacing: 4,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+      ), // Add horizontal padding
       children: List.generate(4, (index) => _buildGridShimmerItem()),
     );
   }
 
-  // Shimmer placeholder for health stats card.
   Widget _buildHealthStatsShimmer(BuildContext context) {
-    return Shimmer.fromColors(
-      key: const ValueKey('healthStatsShimmer'),
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 4,
-        child: Container(height: 80, padding: const EdgeInsets.all(16)),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Shimmer.fromColors(
+        key: const ValueKey('healthStatsShimmer'),
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Container(
+          height: 140, // Match approximate height of the real card
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -245,22 +369,43 @@ class _AdminHomePageState extends State<SupervisorHomePage>
       appBar: AppBar(
         title: Text(
           "admin_panel".tr,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
+        elevation: 1.0, // Slightly lower elevation
+
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Get.to(const SettingsScreen()),
+            tooltip: "Settings",
+            icon: const Icon(Icons.settings_outlined), // Outlined icon
+            onPressed: () => Get.to(() => const SettingsScreen()),
           ),
           _buildAccountMenu(context),
+          const SizedBox(width: 4), // Add slight padding
         ],
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 80), // Padding for FAB
         child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch, // Stretch children horizontally
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: 20), // Top padding
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "dashboard_overview".tr, // Example title for the grid
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Grid Section
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+              ), // Padding around grid
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child:
@@ -271,64 +416,78 @@ class _AdminHomePageState extends State<SupervisorHomePage>
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 4, // Consistent spacing
+                          mainAxisSpacing: 4,
                           children: [
                             _adminCard(
                               context,
-                              Icons.people,
+                              Icons.people_outline, // Outlined icon
                               "pilgrims".tr,
-                              () {
-                                Get.to(() => const UsersListPage());
-                              },
-                              Colors.blue,
+                              () => Get.to(() => const UsersListPage()),
+                              Colors.blueAccent.shade400,
                             ),
                             _adminCard(
                               context,
-                              Icons.health_and_safety,
+                              Icons
+                                  .monitor_heart_outlined, // More specific health icon
                               "health_notifications".tr,
-                              () {
-                                Get.to(() => const HealthNotificationsPage());
-                              },
-                              Colors.red,
+                              () =>
+                                  Get.to(() => const HealthNotificationsPage()),
+                              Colors.redAccent.shade200, // Consistent red
                             ),
                             _adminCard(
                               context,
-                              Icons.medical_services,
+                              Icons.medical_services_outlined, // Outlined icon
                               "medical_services".tr,
-                              () {
-                                Get.to(() => MedicalServicesPage());
-                              },
-                              Colors.green,
+                              () => Get.to(() => MedicalServicesPage()),
+                              Colors.green.shade500,
                             ),
                             _adminCard(
                               context,
-                              Icons.devices,
-                              "device_management".tr,
-                              () {
-                                Get.to(() => const SupervisorCampaignsPage());
-                              },
-                              Colors.orange,
+                              Icons.campaign_outlined, // ** CHANGED ICON **
+                              "campaigns".tr, // ** CHANGED LABEL **
+                              () => Get.to(
+                                () => const SupervisorCampaignsPage(),
+                              ), // Ensure this page exists
+                              Colors.orange.shade600,
                             ),
                           ],
                         ),
               ),
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 24), // Spacing before stats card
             Padding(
-              padding: const EdgeInsets.all(8),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child:
-                    _isLoading
-                        ? _buildHealthStatsShimmer(context)
-                        : _buildHealthStatsCard(context),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "current_status".tr, // Example title for stats
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // Health Stats Section
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              child:
+                  _isLoading
+                      ? _buildHealthStatsShimmer(context)
+                      : _buildHealthStatsCard(context),
+            ),
+            const SizedBox(height: 20), // Bottom padding
           ],
         ),
       ),
+
+      // --- Floating Action Button to Refresh Counts ---
     );
+  }
+
+  @override
+  void dispose() {
+    // Dispose any controllers if you re-add them
+    super.dispose();
   }
 }
