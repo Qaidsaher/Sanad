@@ -71,11 +71,12 @@ class Pilgrim {
 
 // User Model (corresponds to the authentication account)
 class UserModel {
-  final String id; // Document ID (often the same as Firebase Auth UID)
+  final String id;
   final String username;
-  final String email; // Should be unique
+  final String email;
   final String phone;
-  final String role; // "admin", "pilgrim", or "supervisor"
+  final String role;
+  final String token; // Default value: ''
 
   UserModel({
     required this.id,
@@ -83,6 +84,7 @@ class UserModel {
     required this.email,
     required this.phone,
     required this.role,
+    this.token = '', // ✅ Default value
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -92,7 +94,8 @@ class UserModel {
       username: data['username'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'] ?? '',
-      role: data['role'] ?? 'admin', // Default role if none provided
+      role: data['role'] ?? '',
+      token: data['token'] ?? '', // ✅ Uses default if null in Firestore
     );
   }
 
@@ -102,6 +105,7 @@ class UserModel {
       'email': email,
       'phone': phone,
       'role': role,
+      'token': token,
     };
   }
 }
@@ -110,25 +114,17 @@ class UserModel {
 class Admin {
   final String id; // Admin Document ID
   final String
-      userId; // Foreign key reference to a UserModel document ID (or Auth UID)
+  userId; // Foreign key reference to a UserModel document ID (or Auth UID)
 
-  Admin({
-    required this.id,
-    required this.userId,
-  });
+  Admin({required this.id, required this.userId});
 
   factory Admin.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Admin(
-      id: doc.id,
-      userId: data['userId'] ?? '',
-    );
+    return Admin(id: doc.id, userId: data['userId'] ?? '');
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'userId': userId,
-    };
+    return {'userId': userId};
   }
 }
 
@@ -178,23 +174,15 @@ class SmartBracelet {
   final String id; // Bracelet Document ID
   final String serialNumber;
 
-  SmartBracelet({
-    required this.id,
-    required this.serialNumber,
-  });
+  SmartBracelet({required this.id, required this.serialNumber});
 
   factory SmartBracelet.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return SmartBracelet(
-      id: doc.id,
-      serialNumber: data['serialNumber'] ?? '',
-    );
+    return SmartBracelet(id: doc.id, serialNumber: data['serialNumber'] ?? '');
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'serialNumber': serialNumber,
-    };
+    return {'serialNumber': serialNumber};
   }
 }
 
