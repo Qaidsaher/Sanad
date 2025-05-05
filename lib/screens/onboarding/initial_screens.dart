@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:sanad/screens/onboarding/onboarding_screens.dart';
 import 'package:sanad/screens/splash.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// ------------------------
@@ -32,7 +32,7 @@ class _InitialScreenState extends State<InitialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _showOnboarding ? const OnboardingScreen() : const SplashScreen();
+    return _showOnboarding ? OnboardingScreen() : const SplashScreen();
     // return _showOnboarding ? const OnboardingScreen() : const AdminDashboard();
   }
 }

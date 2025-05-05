@@ -182,7 +182,7 @@ class SmartBracelet {
   }
 
   Map<String, dynamic> toMap() {
-    return {'serialNumber': serialNumber};
+    return {'serialNumber ': serialNumber};
   }
 }
 

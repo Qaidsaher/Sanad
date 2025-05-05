@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sanad/screens/admins/settings.dart';
+import 'package:sanad/screens/auth/login.dart';
 // Make sure this import points to your actual campaigns page
 import 'package:sanad/screens/supervisors/campaign.dart';
 import 'package:sanad/screens/supervisors/health_notifications.dart';
@@ -94,25 +95,25 @@ class _SupervisorHomePageState extends State<SupervisorHomePage>
                 ],
               ),
             ),
-            PopupMenuItem(
-              value: "delete",
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.delete_forever_outlined,
-                    color: Colors.red.shade700,
-                  ),
-                  const SizedBox(width: 12),
-                  Text("delete_account".tr),
-                ],
-              ),
-            ),
+            // PopupMenuItem(
+            //   value: "delete",
+            //   child: Row(
+            //     children: [
+            //       Icon(
+            //         Icons.delete_forever_outlined,
+            //         color: Colors.red.shade700,
+            //       ),
+            //       const SizedBox(width: 12),
+            //       Text("delete_account".tr),
+            //     ],
+            //   ),
+            // ),
           ],
       onSelected: (value) async {
         // (Keep your existing logout/delete logic here)
         if (value == "logout") {
           await FirebaseAuth.instance.signOut();
-          Get.offAllNamed('/login');
+          Get.offAll(() => const LoginScreen());
         } else if (value == "delete") {
           bool confirmed = await showDialog(
             context: context,

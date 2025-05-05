@@ -1,0 +1,99 @@
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+
+admin.initializeApp();
+
+// Define your threshold values
+const TEMPERATURE_HIGH_THRESHOLD = 38.0; // Example: 38.0°C
+const TEMPERATURE_LOW_THRESHOLD = 36.0;   // Example: 36.0°C
+const BLOOD_OXYGEN_LOW_THRESHOLD = 90.0;  // Example: 90%
+const HEART_RATE_HIGH_THRESHOLD = 100;    // Example: 100 bpm
+const HEART_RATE_LOW_THRESHOLD = 60;      // Example: 60 bpm
+
+exports.sendHealthNotification = functions.firestore
+    .document('HealthData/{healthDataId}')
+    .onUpdate(async (change, context) => {
+        // Get the new and old health data
+        const newHealthData = change.after.data();
+        const oldHealthData = change.before.data();
+
+        // Check for significant changes
+        const hasHighTemperature = newHealthData.temperature > TEMPERATURE_HIGH_THRESHOLD &&
+                                  oldHealthData.temperature <= TEMPERATURE_HIGH_THRESHOLD;
+        const hasLowTemperature = newHealthData.temperature < TEMPERATURE_LOW_THRESHOLD &&
+                                 oldHealthData.temperature >= TEMPERATURE_LOW_THRESHOLD;
+        const hasLowBloodOxygen = newHealthData.bloodOxygen < BLOOD_OXYGEN_LOW_THRESHOLD &&
+                                oldHealthData.bloodOxygen >= BLOOD_OXYGEN_LOW_THRESHOLD;
+        const hasHighHeartRate = newHealthData.heartRate > HEART_RATE_HIGH_THRESHOLD &&
+                                 oldHealthData.heartRate <= HEART_RATE_HIGH_THRESHOLD;
+        const hasLowHeartRate = newHealthData.heartRate < HEART_RATE_LOW_THRESHOLD &&
+                                oldHealthData.heartRate >= HEART_RATE_LOW_THRESHOLD;
+
+        // If no significant changes, exit.
+        if (!hasHighTemperature && !hasLowTemperature && !hasLowBloodOxygen && !hasHighHeartRate && !hasLowHeartRate) {
+            return null;
+        }
+
+        const pilgrimId = newHealthData.pilgrimId;
+
+        // Get the pilgrim's user ID from the Pilgrim collection
+        const pilgrimDoc = await admin.firestore().collection('Pilgrim').doc(pilgrimId).get();
+        if (!pilgrimDoc.exists) {
+            console.error('Pilgrim document not found:', pilgrimId);
+            return null; // Important: Exit the function if pilgrim not found
+        }
+        const pilgrimData = pilgrimDoc.data();
+        const userId = pilgrimData.userId;
+
+        // Get the user's FCM token from the User collection
+        const userDoc = await admin.firestore().collection('User').doc(userId).get();
+        if (!userDoc.exists) {
+            console.error('User document not found:', userId);
+            return null; // Important: Exit the function if user not found
+        }
+        const userData = userDoc.data();
+        const token = userData.token;  // Get the token
+
+        if (!token) {
+            console.error('User has no FCM token:', userId);
+            return null; // Important:  Exit if no token.  Don't send to null token.
+        }
+        let notificationBody = '';
+
+        if (hasHighTemperature) {
+            notificationBody += `Temperature is high: ${newHealthData.temperature}°C. `;
+        }
+        if (hasLowTemperature) {
+            notificationBody += `Temperature is low: ${newHealthData.temperature}°C. `;
+        }
+        if (hasLowBloodOxygen) {
+            notificationBody += `Blood oxygen is low: ${newHealthData.bloodOxygen}%. `;
+        }
+        if (hasHighHeartRate) {
+            notificationBody += `Heart rate is high: ${newHealthData.heartRate} bpm. `;
+        }
+        if (hasLowHeartRate) {
+            notificationBody += `Heart rate is low: ${newHealthData.heartRate} bpm. `;
+        }
+
+        // Construct the notification payload.
+        const payload = {
+            notification: {
+                title: 'Health Alert!',
+                body: notificationBody,
+                icon: 'https://your-app.com/health_icon.png', // Replace with a suitable icon
+                click_action: 'https://your-app.com/health',  // Optional action
+            },
+            token: token, // Use the token from the user's document.
+        };
+
+        try {
+            // Send the notification
+            const response = await admin.messaging().send(payload);
+            console.log('Notification sent:', response);
+            return null;
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            return null; //  Important:  Handle the error.
+        }
+    });

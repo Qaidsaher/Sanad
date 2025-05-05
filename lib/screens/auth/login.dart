@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sanad/screens/admins/dashboard.dart';
 import 'package:sanad/screens/pilgrims/profile/profile.dart';
 import 'package:sanad/screens/supervisors/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'forgetpassword.dart';
 import 'register.dart';
@@ -75,6 +76,15 @@ class _LoginScreenState extends State<LoginScreen>
 
         // ✅ Read the role/type field (e.g., 'admin' or 'normal')
         String userType = userDoc.get('role') ?? 'pilgrim';
+        // 🔐 Get token from SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? token = prefs.getString('fcmToken') ?? '';
+
+        // 🔁 Update the token in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'token': token});
 
         // ✅ Navigate based on user type
         if (userType == 'admin') {

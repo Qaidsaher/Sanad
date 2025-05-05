@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+     OnboardingScreen({Key? key}) : super(key: key);
 
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
@@ -26,10 +26,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   final List<Color> backgroundColors = [
-    const Color(0xFFFFFAED),
-    const Color(0xFFF8F8F7),
-    const Color(0xFFFEF6EF),
-    const Color(0xFFF8F8F8),
+       Color(0xFFFFFAED),
+       Color(0xFFF8F8F7),
+       Color(0xFFFEF6EF),
+       Color(0xFFF8F8F8),
   ];
 
   final List<Color> themeColors = [
@@ -44,7 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _onSkip() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("onboardingSeen", true);
-    Get.off(() => const SplashScreen());
+    Get.off(() =>    SplashScreen());
   }
 
   void _onNext() async {
@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _onSkip();
     } else {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration:    Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
     }
@@ -64,8 +64,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       children: List.generate(
         pages.length,
         (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          duration:    Duration(milliseconds: 300),
+          margin:    EdgeInsets.symmetric(horizontal: 4),
           width: currentIndex == index ? 12 : 8,
           height: currentIndex == index ? 12 : 8,
           decoration: BoxDecoration(
@@ -118,9 +118,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
                   : BorderSide.none,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+            padding:    EdgeInsets.symmetric(horizontal: 10, vertical: 1),
           ),
-          child: Text(lang['name'], style: const TextStyle(fontSize: 13)),
+          child: Text(lang['name'], style:    TextStyle(fontSize: 13)),
         );
       }).toList(),
     );
@@ -197,7 +197,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: TextButton(
               onPressed: _onSkip,
               child:
-                  Text("skip".tr, style: const TextStyle(color: Colors.grey)),
+                  Text("skip".tr, style:    TextStyle(color: Colors.grey)),
             ),
           ),
           Positioned(
@@ -228,14 +228,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onPressed: _onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding:    EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Text(
                 currentIndex == pages.length - 1 ? "get_started".tr : "next".tr,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
+                style:    TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
           ),
