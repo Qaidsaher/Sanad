@@ -37,6 +37,18 @@ InputDecoration _inputDecoration(
 // --- User List Screen ---
 class UserListScreen extends StatelessWidget {
   const UserListScreen({Key? key}) : super(key: key);
+  Color getRoleColor(String role) {
+    switch (role) {
+      case 'admin':
+        return Colors.red;
+      case 'supervisor':
+        return Colors.orange;
+      case 'pilgrim':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 
   Future<void> _confirmDeleteUser(BuildContext context, UserModel user) async {
     Get.defaultDialog(
@@ -127,7 +139,10 @@ class UserListScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final user = UserModel.fromFirestore(users[index]);
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: ListTile(
                   leading: CircleAvatar(
                     child: Text(
@@ -135,9 +150,25 @@ class UserListScreen extends StatelessWidget {
                     ),
                   ),
                   title: Text(user.username),
-                  subtitle: Text(
-                    "${user.email}\n${'role'.tr}: ${user.role.tr}",
+                  subtitle: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: "${user.email}\n"),
+                        TextSpan(text: "${'role'.tr}: "),
+                        TextSpan(
+                          text: user.role.tr,
+                          style: TextStyle(
+                            color: getRoleColor(
+                              user.role,
+                            ), // Color based on role
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: const TextStyle(height: 1.4),
                   ),
+
                   isThreeLine: true,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

@@ -346,6 +346,3 @@ class SanadApp extends StatelessWidget {
     });
   }
 }
-
-// --- Mock Screens (Add parameters to accept type/data) ---
-// You'll need to modify your actual screens

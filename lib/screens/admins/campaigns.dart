@@ -1,11 +1,11 @@
 import 'dart:async'; // For Future
 
-import 'package:sanad/models/models.dart';
-import 'package:sanad/screens/admins/dashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanad/models/models.dart';
+import 'package:sanad/screens/admins/dashboard.dart';
 // ========================================================================
 
 // ========================================================================
@@ -35,7 +35,10 @@ class CampaignListScreen extends StatelessWidget {
   const CampaignListScreen({Key? key}) : super(key: key);
 
   Future<void> _confirmDelete(
-      BuildContext context, String campaignId, String name) async {
+    BuildContext context,
+    String campaignId,
+    String name,
+  ) async {
     return Get.defaultDialog(
       title: "confirmDelete".tr,
       titleStyle: const TextStyle(
@@ -44,10 +47,7 @@ class CampaignListScreen extends StatelessWidget {
         color: Colors.black87,
       ),
       middleText: "${'areYouSureDeleteCampaign'.tr} '$name'?",
-      middleTextStyle: const TextStyle(
-        fontSize: 16,
-        color: Colors.black54,
-      ),
+      middleTextStyle: const TextStyle(fontSize: 16, color: Colors.black54),
       backgroundColor: Colors.white,
       barrierDismissible: false,
       radius: 12,
@@ -57,11 +57,12 @@ class CampaignListScreen extends StatelessWidget {
           Get.back(); // Close dialog
           try {
             // Check if any pilgrims are assigned to this campaign
-            QuerySnapshot pilgrimCheck = await FirebaseFirestore.instance
-                .collection(pilgrimsCollection)
-                .where('campaignId', isEqualTo: campaignId)
-                .limit(1)
-                .get();
+            QuerySnapshot pilgrimCheck =
+                await FirebaseFirestore.instance
+                    .collection(pilgrimsCollection)
+                    .where('campaignId', isEqualTo: campaignId)
+                    .limit(1)
+                    .get();
             if (pilgrimCheck.docs.isNotEmpty) {
               Get.snackbar(
                 'error'.tr,
@@ -117,10 +118,11 @@ class CampaignListScreen extends StatelessWidget {
     return Scaffold(
       body: StreamBuilder<QuerySnapshot>(
         // Only order by campaignYear in the query to avoid composite index error
-        stream: FirebaseFirestore.instance
-            .collection(campaignsCollection)
-            .orderBy('campaignYear', descending: true)
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection(campaignsCollection)
+                .orderBy('campaignYear', descending: true)
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const ListShimmer(); // Your ListShimmer widget
@@ -140,39 +142,54 @@ class CampaignListScreen extends StatelessWidget {
           });
 
           return ListView.builder(
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                final campaign = Campaign.fromFirestore(docs[index]);
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    leading: const Icon(Icons.campaign, color: Colors.purple),
-                    title: Text(campaign.campaignName),
-                    subtitle: Text(
-                        "${'year'.tr}: ${campaign.campaignYear}, ${'phone'.tr}: ${campaign.phone}"),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined,
-                              color: Colors.orange),
-                          tooltip: 'editCampaign'.tr,
-                          onPressed: () => Get.to(
-                              () => EditCampaignScreen(campaign: campaign)),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outlined,
-                              color: Colors.red),
-                          tooltip: 'delete'.tr,
-                          onPressed: () => _confirmDelete(
-                              context, campaign.id, campaign.campaignName),
-                        ),
-                      ],
-                    ),
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final campaign = Campaign.fromFirestore(docs[index]);
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.campaign, color: Colors.purple),
+                  title: Text(campaign.campaignName),
+                  subtitle: Text(
+                    "${'year'.tr}: ${campaign.campaignYear}, ${'phone'.tr}: ${campaign.phone}",
                   ),
-                );
-              });
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          color: Colors.orange,
+                        ),
+                        tooltip: 'editCampaign'.tr,
+                        onPressed:
+                            () => Get.to(
+                              () => EditCampaignScreen(campaign: campaign),
+                            ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outlined,
+                          color: Colors.red,
+                        ),
+                        tooltip: 'delete'.tr,
+                        onPressed:
+                            () => _confirmDelete(
+                              context,
+                              campaign.id,
+                              campaign.campaignName,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -220,31 +237,41 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
   Future<void> _fetchCurrentAdminDocId() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      Get.snackbar('error'.tr, 'notLoggedIn'.tr,
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'error'.tr,
+        'notLoggedIn'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
     final String userUid = currentUser.uid;
 
     try {
       // Assuming the 'admins' collection links the Firebase UID ('userId') to the Admin Doc ID
-      QuerySnapshot adminSnapshot = await FirebaseFirestore.instance
-          .collection(adminsCollection)
-          .where('userId', isEqualTo: userUid)
-          .limit(1)
-          .get();
+      QuerySnapshot adminSnapshot =
+          await FirebaseFirestore.instance
+              .collection(adminsCollection)
+              .where('userId', isEqualTo: userUid)
+              .limit(1)
+              .get();
       if (adminSnapshot.docs.isNotEmpty) {
         setState(() => _adminDocId = adminSnapshot.docs.first.id);
       } else {
         print("Error: No admin profile found for user UID: $userUid");
-        Get.snackbar('error'.tr, 'adminProfileNotFound'.tr,
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'error'.tr,
+          'adminProfileNotFound'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
         setState(() => _adminDocId = null);
       }
     } catch (e) {
       print("Error fetching admin ID: $e");
-      Get.snackbar('error'.tr, 'errorFetchingAdminInfo'.tr,
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'error'.tr,
+        'errorFetchingAdminInfo'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       setState(() => _adminDocId = null);
     }
   }
@@ -252,9 +279,12 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
   Future<void> _createCampaign() async {
     if (_formKey.currentState!.validate()) {
       if (_adminDocId == null) {
-        Get.snackbar('error'.tr, 'cannotCreateCampaignNoAdmin'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent);
+        Get.snackbar(
+          'error'.tr,
+          'cannotCreateCampaignNoAdmin'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+        );
         return;
       }
       if (_isLoading) return;
@@ -279,16 +309,21 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
         // Save the campaign to Firestore
         await docRef.set(newCampaign.toMap());
 
-        Get.snackbar('success'.tr, 'campaignCreatedSuccess'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white);
+        Get.snackbar(
+          'success'.tr,
+          'campaignCreatedSuccess'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.back();
       } catch (e) {
         Get.snackbar(
-            'error'.tr, '${'errorCreatingCampaign'.tr}: ${e.toString()}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent);
+          'error'.tr,
+          '${'errorCreatingCampaign'.tr}: ${e.toString()}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+        );
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -308,15 +343,19 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: _inputDecoration('campaignName'.tr, Icons.title),
-                validator: (val) => val == null || val.trim().isEmpty
-                    ? 'requiredField'.tr
-                    : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'requiredField'.tr
+                            : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _yearController,
-                decoration:
-                    _inputDecoration('campaignYear'.tr, Icons.calendar_today),
+                decoration: _inputDecoration(
+                  'campaignYear'.tr,
+                  Icons.calendar_today,
+                ),
                 keyboardType: TextInputType.number,
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -334,34 +373,39 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
                 controller: _phoneController,
                 decoration: _inputDecoration('phone'.tr, Icons.phone),
                 keyboardType: TextInputType.phone,
-                validator: (val) => val == null || val.trim().isEmpty
-                    ? 'requiredField'.tr
-                    : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'requiredField'.tr
+                            : null,
               ),
               const SizedBox(height: 16),
               // Dropdown for selecting a supervisor (users with role 'supervisor')
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection(usersCollection)
-                    .where('role', isEqualTo: 'supervisor')
-                    .snapshots(),
+                stream:
+                    FirebaseFirestore.instance
+                        .collection(usersCollection)
+                        .where('role', isEqualTo: 'supervisor')
+                        .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const CircularProgressIndicator();
                   }
                   List<DropdownMenuItem<String>> supervisorItems =
                       snapshot.data!.docs.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    final supervisorName = data['username'] ?? 'No Name';
-                    final supervisorId = doc.id;
-                    return DropdownMenuItem<String>(
-                      value: supervisorId,
-                      child: Text(supervisorName),
-                    );
-                  }).toList();
+                        final data = doc.data() as Map<String, dynamic>;
+                        final supervisorName = data['username'] ?? 'No Name';
+                        final supervisorId = doc.id;
+                        return DropdownMenuItem<String>(
+                          value: supervisorId,
+                          child: Text(supervisorName),
+                        );
+                      }).toList();
                   return DropdownButtonFormField<String>(
                     decoration: _inputDecoration(
-                        'selectSupervisor'.tr, Icons.supervisor_account),
+                      'selectSupervisor'.tr,
+                      Icons.supervisor_account,
+                    ),
                     value: _selectedSupervisorId,
                     items: supervisorItems,
                     onChanged: (value) {
@@ -369,8 +413,8 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
                         _selectedSupervisorId = value;
                       });
                     },
-                    validator: (value) =>
-                        value == null ? 'requiredField'.tr : null,
+                    validator:
+                        (value) => value == null ? 'requiredField'.tr : null,
                   );
                 },
               ),
@@ -378,18 +422,22 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
               if (_adminDocId == null && !_isLoading)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Text('warningCannotCreateAdmin'.tr,
-                      style: TextStyle(color: Colors.orange.shade800),
-                      textAlign: TextAlign.center),
+                  child: Text(
+                    'warningCannotCreateAdmin'.tr,
+                    style: TextStyle(color: Colors.orange.shade800),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50)),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
                 onPressed:
                     _isLoading || _adminDocId == null ? null : _createCampaign,
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text('create'.tr),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('create'.tr),
               ),
             ],
           ),
@@ -403,7 +451,7 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
 class EditCampaignScreen extends StatefulWidget {
   final Campaign campaign;
   const EditCampaignScreen({Key? key, required this.campaign})
-      : super(key: key);
+    : super(key: key);
   @override
   _EditCampaignScreenState createState() => _EditCampaignScreenState();
 }
@@ -419,8 +467,9 @@ class _EditCampaignScreenState extends State<EditCampaignScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.campaign.campaignName);
-    _yearController =
-        TextEditingController(text: widget.campaign.campaignYear.toString());
+    _yearController = TextEditingController(
+      text: widget.campaign.campaignYear.toString(),
+    );
     _phoneController = TextEditingController(text: widget.campaign.phone);
   }
 
@@ -439,7 +488,8 @@ class _EditCampaignScreenState extends State<EditCampaignScreen> {
       try {
         Map<String, dynamic> data = {
           'campaignName': _nameController.text.trim(),
-          'campaignYear': int.tryParse(_yearController.text.trim()) ??
+          'campaignYear':
+              int.tryParse(_yearController.text.trim()) ??
               widget.campaign.campaignYear,
           'phone': _phoneController.text.trim(),
           // adminId is usually not changed during edit
@@ -448,16 +498,21 @@ class _EditCampaignScreenState extends State<EditCampaignScreen> {
             .collection(campaignsCollection)
             .doc(widget.campaign.id)
             .update(data);
-        Get.snackbar('success'.tr, 'campaignUpdatedSuccess'.tr, // Add key
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white);
+        Get.snackbar(
+          'success'.tr,
+          'campaignUpdatedSuccess'.tr, // Add key
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.back();
       } catch (e) {
-        Get.snackbar('error'.tr,
-            '${'errorUpdatingCampaign'.tr}: ${e.toString()}', // Add key
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.redAccent);
+        Get.snackbar(
+          'error'.tr,
+          '${'errorUpdatingCampaign'.tr}: ${e.toString()}', // Add key
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+        );
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -477,15 +532,19 @@ class _EditCampaignScreenState extends State<EditCampaignScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: _inputDecoration('campaignName'.tr, Icons.title),
-                validator: (val) => val == null || val.trim().isEmpty
-                    ? 'requiredField'.tr
-                    : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'requiredField'.tr
+                            : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _yearController,
-                decoration:
-                    _inputDecoration('campaignYear'.tr, Icons.calendar_today),
+                decoration: _inputDecoration(
+                  'campaignYear'.tr,
+                  Icons.calendar_today,
+                ),
                 keyboardType: TextInputType.number,
                 validator: (val) {
                   if (val == null || val.trim().isEmpty)
@@ -501,32 +560,37 @@ class _EditCampaignScreenState extends State<EditCampaignScreen> {
                 controller: _phoneController,
                 decoration: _inputDecoration('phone'.tr, Icons.phone),
                 keyboardType: TextInputType.phone,
-                validator: (val) => val == null || val.trim().isEmpty
-                    ? 'requiredField'.tr
-                    : null,
+                validator:
+                    (val) =>
+                        val == null || val.trim().isEmpty
+                            ? 'requiredField'.tr
+                            : null,
               ),
               // Optional: Display Admin ID (read-only)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: TextFormField(
                   initialValue: widget.campaign.adminId,
-                  decoration:
-                      _inputDecoration('Admin ID', Icons.admin_panel_settings)
-                          .copyWith(
-                              filled: true,
-                              fillColor: Colors
-                                  .grey[200]), // Assuming 'Admin ID' key exists
+                  decoration: _inputDecoration(
+                    'Admin ID',
+                    Icons.admin_panel_settings,
+                  ).copyWith(
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ), // Assuming 'Admin ID' key exists
                   readOnly: true,
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50)),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
                 onPressed: _isLoading ? null : _updateCampaign,
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text('update'.tr),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('update'.tr),
               ),
             ],
           ),

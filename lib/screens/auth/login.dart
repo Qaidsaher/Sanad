@@ -8,7 +8,6 @@ import 'package:sanad/screens/supervisors/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'forgetpassword.dart';
-import 'register.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -215,10 +214,10 @@ class _LoginScreenState extends State<LoginScreen>
                           () => Get.to(() => const ForgotPasswordScreen()),
                       child: Text("forgot_password".tr),
                     ),
-                    TextButton(
-                      onPressed: () => Get.to(() => const RegisterScreen()),
-                      child: Text("no_account".tr),
-                    ),
+                    // TextButton(
+                    //   onPressed: () => Get.to(() => const RegisterScreen()),
+                    //   child: Text("no_account".tr),
+                    // ),
                   ],
                 ),
               ],

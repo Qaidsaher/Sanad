@@ -143,7 +143,7 @@ class PilgrimListScreen extends StatelessWidget {
               avatarProvider = const AssetImage('assets/default_avatar.png');
               if (pilgrim.avatar != null && pilgrim.avatar!.isNotEmpty) {
                 try {
-                  // avatarProvider = MemoryImage(base64Decode(pilgrim.avatar!));
+                  avatarProvider = MemoryImage(base64Decode(pilgrim.avatar!));
                 } catch (e) {
                   avatarProvider = const AssetImage(
                     'assets/default_avatar.png',
@@ -154,7 +154,10 @@ class PilgrimListScreen extends StatelessWidget {
               }
 
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: ListTile(
                   leading: CircleAvatar(backgroundImage: avatarProvider),
                   title: Text(pilgrim.fullName),
